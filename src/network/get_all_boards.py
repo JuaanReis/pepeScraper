@@ -4,26 +4,25 @@
 
     Author: JuaanReis
     Date: 28-08-2025
-    Last modification: -
+    Last modification: 24-09-2025
     E-mail: teixeiradosreisjuan@gmail.com   
     Version: 0.0.1
 
     Example:
-        from get_all_boards import get_boards, get_request
+        from get_all_boards import get_boards_api
 
-        response = get_request(url)
-        boards = get_boards(response)
+        boards = get_boards_api()
 
         for board in boards:
             print(board)
 """
 
 import httpx
-from ..utils.load_config import load_config_json
-import re
-from bs4 import BeautifulSoup
+from httpx import Response
+from src.utils.load_config import load_config_json
+import json
 
-def get_response(url):
+def get_response(url: str) -> Response | None:
     try:
         DATA = load_config_json()
         with httpx.Client(http2=True) as client:
@@ -31,19 +30,13 @@ def get_response(url):
         return response
     except httpx.RequestError:
         return None
-        
-def get_boards(response):
-    if response is None:
-        return []
-    try:
-        soup = BeautifulSoup(response.text, 'html.parser')
-        pattern = re.compile(r"^//boards\.4chan\.org/([a-z0-9]+)/?$")
-        boards = set()
-        for a in soup.find_all("a", href=pattern):
-            match = pattern.match(a['href'])
-            if match:
-                board_name = match.group(1)
-                boards.add(board_name)
-        return list(boards)
-    except Exception as e:
-        return []
+
+def get_boards_api() -> list:
+    boards = get_response("https://a.4cdn.org/boards.json")
+    if not boards:
+        print("ERROR: could not access the api.")
+        return
+    with open("./src/data/boards.json", "w") as f:
+        json.dump(boards.json(), f, indent=4)
+    
+    return boards.json()
