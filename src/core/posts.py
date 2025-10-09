@@ -1,17 +1,19 @@
 """
     Function that lists the threads and makes a request to find the post information.
 
-    Author: JuaanReis
-    Date: 24-09-2025
-    Last modification: 25-09-2025
-    E-mail: teixeiradosreisjuan@gmail.com
-    Version: 0.0.1
+    **Author:** JuaanReis       
+    **Date:** 24-09-2025        
+    **Last modification:** 08-10-2025       
+    **E-mail:** teixeiradosreisjuan@gmail.com       
+    **Version:** 1.1.3b2        
 
-    Example:
-        from src.core.posts import save_threads, get_post_thread
+    **Example:**
+        ```python
+    from src.core.posts import save_threads, get_post_thread
 
-        threads_dict = get_post_thread()
-        save_threads(threads_dict)
+    threads_dict = get_post_thread()
+    save_threads(threads_dict)
+        ```
 """
 import json
 from src.network.get_all_boards import get_response

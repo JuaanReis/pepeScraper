@@ -1,15 +1,17 @@
 """
     Functions that search for the term passed by the user in a context on 4chan.
 
-    Author: JuaanReis
-    Date: 25-09-2025
-    Last modification: -
-    E-mail: teixeiradosreisjuan@gmail.com
-    Version: 0.0.1
+    **Author:** JuaanReis       
+    **Date:** 25-09-2025        
+    **Last modification:** 08-10-2025        
+    **E-mail:** teixeiradosreisjuan@gmail.com       
+    **Version:** 1.1.3b2            
 
-    Example:
-        from src.core.search_post import search_threads
-        result = search_threads(args)
+    **Example:**
+        ```python
+    from src.core.search_post import search_threads
+    result = search_threads(args)
+        ```
 """
 from src.core.posts import get_post_thread, get_thread_info
 from concurrent.futures import ThreadPoolExecutor, as_completed

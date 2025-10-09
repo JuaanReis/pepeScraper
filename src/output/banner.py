@@ -1,11 +1,18 @@
 """
     Function for styling and information on the use of the program when running it.
 
-    Author: JuaanReis
-    Date: 25-09-2025
-    Last modification: -
-    E-mail: teixeiradosreisjuan@gmail.com
-    Version: 0.0.1
+    **Author:** JuaanReis       
+    **Date:** 25-09-2025        
+    **Last modification:** 08-10-2025       
+    **E-mail:** teixeiradosreisjuan@gmail.com       
+    **Version:** 1.1.3b2        
+
+    **Example:**
+        ```python
+    from output.banner import banner_info
+    
+    banner_info()
+        ```
 """
 from src.flags import parse_args
 from colorama import Fore, Style, init

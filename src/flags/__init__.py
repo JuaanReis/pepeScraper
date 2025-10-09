@@ -1,18 +1,20 @@
 """
     Function that returns the flags for user-program communication.
 
-    Author: JuaanReis
-    Date: 24-09-2025
-    Last modification: 25-09-2025
-    E-mail: teixeiradosreisjuan@gmail.com
-    Version: 0.0.1
+    **Author:** JuaanReis               
+    **Date:** 24-09-2025        
+    **Last modification:** 08-10-2025       
+    **E-mail:** teixeiradosreisjuan@gmail.com       
+    **Version** 1.1.3b2     
 
-    Example:
-        from flags import parse_args
+    **Example:**
+        ```python
+    from flags import parse_args
 
-        args = parse_args
-        key = args.key
-        print(key)
+    args = parse_args
+    key = args.key
+    print(key)
+        ```
 """
 
 import argparse
@@ -30,8 +32,10 @@ def parse_args() -> Namespace | None:
         parse.add_argument("--min-replies", "-mnr", type=int, help="--min-replies <n>")
         parse.add_argument("--max-replies", "-mxr", type=int, help="--max-replies <n>")
         parse.add_argument("--board", "-b", nargs="+", type=str, help="--board <board_name>", required=True)
-        parse.add_argument("threads", "-T", type=int, default=30, help="-T <n>")
+        parse.add_argument("--threads", "-T", type=int, default=30, help="-T <n>")
         parse.add_argument("--op-only", "-op", action="store_true", help="Correspond only with the op post -op <Literal [False]>")
+        parse.add_argument("--no-op", "-nop", action="store_true", help="Ignore OP -nop <Literal [False]>")
+        parse.add_argument("--no-nfsw", action="store_true", help="Block a nfsw contents -no-nfsw <Literal [False]>")
         args = parse.parse_args()
         return args
     except argparse.ArgumentTypeError:

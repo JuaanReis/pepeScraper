@@ -5,7 +5,7 @@
     Date: 28-08-2025
     Last modification: -
     E-mail: teixeiradosreisjuan@gmail.com   
-    Version: 0.0.1
+    Version: 1.1.3b2
 
     Example:
         from utils.load_config import load_config_json

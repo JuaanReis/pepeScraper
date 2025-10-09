@@ -2,19 +2,21 @@
     Functions that search and return all 4chan boards, ensuring the project
     does not use deprecated boards and none are left out.
 
-    Author: JuaanReis
-    Date: 28-08-2025
-    Last modification: 25-09-2025
-    E-mail: teixeiradosreisjuan@gmail.com   
-    Version: 0.0.1
+    **Author:** JuaanReis       
+    **Date:** 28-08-2025        
+    **Last modification:** 25-09-2025       
+    **E-mail:** teixeiradosreisjuan@gmail.com           
+    **Version:** 1.1.3b2        
 
-    Example:
-        from get_all_boards import get_boards_api
+    **Example:**
+        ```python
+    from get_all_boards import get_boards_api
 
-        boards = get_boards_api()
+    boards = get_boards_api()
 
-        for board in boards:
-            print(board)
+    for board in boards:
+        print(board)
+        ```
 """
 
 import httpx

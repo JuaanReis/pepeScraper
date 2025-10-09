@@ -1,5 +1,3 @@
-<img src="./assets/meme_banner.gif" width="100%" height="100px" alt="Pepe Banner">
-
 # pepeScreper - 4chan scraper  <img src="./assets/4chan-logo.png" style="height: 20px; width: 20px; margin: 0 0 0 5px">
 
 *A complete scraper for 4chan (I don't guarantee it will be fast)*
@@ -57,6 +55,8 @@ If you use Linux it will also be the same thing above (but Linux sometimes force
     "--board <board_name>": name(s) of the board(s) to search  
     "-T <n>": number of threads that the program will work with (workers in the ThreadPoolExecutor)  
     "--op-only, -op": only consider the original post (OP)  
+    "--no-op, -nop": It's the same as above but the opposite
+    "--no-nfsw": to prohibit vulgar images
 ```
 
 ## Beware of NFSW content
@@ -64,7 +64,7 @@ If you use Linux it will also be the same thing above (but Linux sometimes force
 > *I'm serious, pornography can destroy your brain (no matter how much I write this you'll ignore it)*
 
 ```bash
-    python main.py --keyword "pepe" --exclude "nsfw" --date 2025-01-01
+    python main.py --keyword "pepe" --exclude "nsfw" --no-nfsw --date 01-01-1970
 ```
 *This can make your research perhaps safer (I don't know if I programmed this right).*
 
