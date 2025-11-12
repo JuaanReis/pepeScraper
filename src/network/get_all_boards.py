@@ -4,7 +4,7 @@
 
     **Author:** JuaanReis       
     **Date:** 28-08-2025        
-    **Last modification:** 10-11-2025       
+    **Last modification:** 12-11-2025       
     **E-mail:** teixeiradosreisjuan@gmail.com           
     **Version:** 1.1.3b3        
 
@@ -20,15 +20,9 @@
 """
 
 import httpx
-from httpx import Response
 import json
 import config
-
-client = httpx.Client(http2=True, timeout=httpx.Timeout(5.0, connect=2.0))
-
-import httpx
 import time
-import config
 
 client = httpx.Client(http2=True, timeout=httpx.Timeout(10.0, connect=5.0))
 
