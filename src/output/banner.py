@@ -3,9 +3,9 @@
 
     **Author:** JuaanReis       
     **Date:** 25-09-2025        
-    **Last modification:** 08-10-2025       
+    **Last modification:** 10-11-2025       
     **E-mail:** teixeiradosreisjuan@gmail.com       
-    **Version:** 1.1.3b2        
+    **Version:** 1.1.3b3        
 
     **Example:**
         ```python
@@ -51,18 +51,25 @@ def banner_info():
     print_line(f"pepeScreper {version}", 35, banner_logo())
 
 def display_links(links: dict):
-
     for board, thread_links in links.items():
-
+        print()
         print(f"{Fore.CYAN}[Board {board}]{Style.RESET_ALL}")
         print("-" * (8 + len(board)))
 
         if thread_links:
-            for i, link in enumerate(thread_links, 1):
-                print(f"{Fore.GREEN}[+] {Style.RESET_ALL}{link}")
+            for thread in thread_links:
+                url = thread.get("url", "unknown")
+                title = thread.get("title", "No title")
+
+                print(
+                    f"{Fore.GREEN}[+] {Style.RESET_ALL}"
+                    f"{Fore.YELLOW}{url}{Style.RESET_ALL} -> "
+                    f"{Fore.MAGENTA}{title}{Style.RESET_ALL}"
+                )
+                
         else:
             print(f"{Fore.RED}[-] Link not found{Style.RESET_ALL}")
-        
+
         print()
 
 if __name__ == "__main__":

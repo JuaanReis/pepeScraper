@@ -1,6 +1,6 @@
 # pepeScreper - 4chan scraper  <img src="./assets/4chan-logo.png" style="height: 20px; width: 20px; margin: 0 0 0 5px">
 
-*A complete scraper for 4chan (I don't guarantee it will be fast)*
+*A complete scraper for 4chan (Now that's fast.)*
 
 pepeScraper is a scraper that uses context for your searches and returns exactly what you want. *(I'm learning how to make an item look cooler than it actually is)*
 
@@ -56,12 +56,12 @@ If you use Linux it will also be the same thing above (but Linux sometimes force
     "-T <n>": number of threads that the program will work with (workers in the ThreadPoolExecutor)  
     "--op-only, -op": only consider the original post (OP)  
     "--no-op, -nop": It's the same as above but the opposite
-    "--no-nfsw": to prohibit vulgar images
+    "--no-nfsw, -nn": to prohibit vulgar images
 ```
 
 ## Beware of NFSW content
 
-> *I'm serious, pornography can destroy your brain (no matter how much I write this you'll ignore it)*
+> I'm serious, pornography can destroy your brain, your body, and your family (no matter how many times I write this, you'll ignore it).
 
 ```bash
     python main.py --keyword "pepe" --exclude "nsfw" --no-nfsw --date 01-01-1970
@@ -70,4 +70,4 @@ If you use Linux it will also be the same thing above (but Linux sometimes force
 
 ---
 <br>
-<a href="https://youtu.be/HWjCStB6k4o?si=C6TMFRuCYLvrzyJH" style="color:white; text-decoration: None; cursor: default">The end?</a>
+<a href="https://youtu.be/HWjCStB6k4o?si=C6TMFRuCYLvrzyJH" style="color:white; text-decoration: None; cursor: text">The end?</a>

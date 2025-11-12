@@ -3,7 +3,7 @@
 
     **Author:** JuaanReis               
     **Date:** 24-09-2025        
-    **Last modification:** 08-10-2025       
+    **Last modification:** 10-11-2025       
     **E-mail:** teixeiradosreisjuan@gmail.com       
     **Version** 1.1.3b2     
 
@@ -23,7 +23,7 @@ from argparse import Namespace
 def parse_args() -> Namespace | None:
     try:
         parse = argparse.ArgumentParser(description="A tool that returns you 4chan boards")
-        parse.add_argument("--thread", "-t", type=int, help="-t <n>")
+        parse.add_argument("--thread", "-t", type=int, help="-t <nnnnnn>")
         parse.add_argument("--key", "-k", nargs="+", type=str, help="--key <keyword>", required=True)
         parse.add_argument("--exclude", type=str, help="--exclude <key1, key2, key3>")
         parse.add_argument("--date", type=str, help="--date <YYYY/MM/DD>")
@@ -35,7 +35,8 @@ def parse_args() -> Namespace | None:
         parse.add_argument("--threads", "-T", type=int, default=30, help="-T <n>")
         parse.add_argument("--op-only", "-op", action="store_true", help="Correspond only with the op post -op <Literal [False]>")
         parse.add_argument("--no-op", "-nop", action="store_true", help="Ignore OP -nop <Literal [False]>")
-        parse.add_argument("--no-nfsw", action="store_true", help="Block a nfsw contents -no-nfsw <Literal [False]>")
+        parse.add_argument("--no-nfsw", "-nn", action="store_true", help="Block a nfsw contents -no-nfsw <Literal [False]>")
+        parse.add_argument("--save-result", "-sr", type=str, help="Save results in file.txt")
         args = parse.parse_args()
         return args
     except argparse.ArgumentTypeError:
