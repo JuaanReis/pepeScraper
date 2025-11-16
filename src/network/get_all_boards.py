@@ -24,7 +24,7 @@ import orjson as json
 import config
 import time
 
-client = httpx.Client(http2=True, timeout=httpx.Timeout(5.0, connect=2.5), limits=httpx.Limits(max_keepalive_connections=100, max_connections=200), headers={"Connection": "keep-alive", "Accept-Encoding": "gzip"}, verify=False)
+client = httpx.Client(http2=True, timeout=httpx.Timeout(5.0, connect=2.5), limits=httpx.Limits(max_keepalive_connections=100, max_connections=200), headers={"Connection": "keep-alive", "Accept-Encoding": "gzip"})
 
 def get_response(url: str, retries: int = 3, delay: float = 1.0) -> httpx.Response | None:
     for attempt in range(retries):
@@ -65,7 +65,7 @@ def get_response(url: str, retries: int = 3, delay: float = 1.0) -> httpx.Respon
         print(f"[FAILED AFTER RETRIES] {url}")
     return None
 
-def get_boards_api() -> list:
+def get_boards_api() -> dict:
     start = time.time()
     boards = get_response("https://a.4cdn.org/boards.json")
     if not boards:
@@ -73,7 +73,7 @@ def get_boards_api() -> list:
         if config.debug and boards is not None:
             print(f"[API STATUS] {boards.status_code}")
         return
-
+        
     with open("./src/data/boards.json", "wb") as f:
         f.write(json.dumps(boards.json()))
     
