@@ -10,8 +10,10 @@ pepeScraper is a scraper that uses context for your searches and returns exactly
 
 ## Table of contents
 
-- [installation](#installation)
-- [care](#beware-of-nfsw-content)
+- [Installation](#installation)
+- [Flags](#flags)
+- [Privacy and data storage](#careful-with-nsfw-content)
+- [Care](#careful-with-nsfw-content)
 
 ## Weird stuff
 
@@ -23,7 +25,7 @@ pepeScraper is a scraper that uses context for your searches and returns exactly
 [![Play Random Video](https://img.shields.io/badge/pepeScreper-V1-darkred?style=flat-square&logo=youtube)](https://www.youtube.com/watch?v=dQw4w9WgXcQ) &nbsp;
 [![Play Random Video](https://img.shields.io/badge/pepeScreper-V2-darkred?style=flat-square&logo=youtube)](https://www.youtube.com/watch?v=QwLvrnlfdNo)
 
-## installation
+## Installation
 
 If you use Windows, just go to releases and download the latest version and then install the dependencies. *If you want to help and have access to the source code, use the code below.*
 
@@ -56,15 +58,33 @@ If you use Linux it will also be the same thing above (but Linux sometimes force
     "-T <n>": number of threads that the program will work with (workers in the ThreadPoolExecutor)  
     "--op-only, -op": only consider the original post (OP)  
     "--no-op, -nop": It's the same as above but the opposite
-    "--no-nfsw, -nn": to prohibit vulgar images
+    "--nsfw, -n": to enable vulgar posts
+    "--nsfw-title, -nt": to enable title vulgar posts
+    "--output, -o": to save the results to a text file (on your computer, just the link).
 ```
 
-## Beware of NFSW content
+## Example
+
+<img src="./assets/1-1-4-rc-1.png" style="height: 300px; background-align: center">
+
+> I know this meme is awful and the screenshot turned out terrible.
+
+## Privacy and Data Storage
+
+PepeScreper does NOT store anything <br>
+it only uses the API and creates a direct link to 4chan. <br>
+No logs, no history, no databases, no Facebook copy (maybe you understand).
+
+Everything is stored in RAM and deleted when the program finishes. (That's right, your mom won't find out what you searched for.)
+
+> Please don't sue me, I don't have the money to pay a lawyer.
+
+## Careful with NSFW Content
 
 > I'm serious, pornography can destroy your brain, your body, and your family (no matter how many times I write this, you'll ignore it).
 
 ```bash
-    python main.py --keyword "pepe" --exclude "nsfw" --no-nfsw --date 01-01-1970
+    python main.py --keyword "pepe" --exclude "nsfw" --date 01-01-1970
 ```
 *This can make your research perhaps safer (I don't know if I programmed this right).*
 

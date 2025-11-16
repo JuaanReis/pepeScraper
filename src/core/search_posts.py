@@ -3,9 +3,9 @@
 
     **Author:** JuaanReis       
     **Date:** 25-09-2025        
-    **Last modification:** 10-11-2025        
+    **Last modification:** 15-11-2025        
     **E-mail:** teixeiradosreisjuan@gmail.com       
-    **Version:** 1.1.3b3            
+    **Version:** 1.1.4rc1            
 
     **Example:**
         ```python
@@ -22,7 +22,7 @@ from config import debug
 
 def search_threads(args: Namespace) -> dict:
     board_args = args.board if args.board else None
-    threads_data = get_post_thread(board_args)
+    threads_data = get_post_thread(board_args, args.threads)
     results = {}
     tasks = []
 
@@ -48,7 +48,7 @@ def search_threads(args: Namespace) -> dict:
     with ThreadPoolExecutor(max_workers=args.threads) as executor:
         futures = {executor.submit(get_thread_info, board, thread_no): (board, thread_no) for board, thread_no in tasks}
 
-        for future in tqdm(as_completed(futures), total=total_tasks, desc="Processing threads", ncols=100):
+        for future in tqdm(as_completed(futures), total=total_tasks, desc="Processing threads", colour="green", ncols=100):
             board, thread_no = futures[future]
             try:
                 thread_info = future.result()
@@ -64,8 +64,6 @@ def search_threads(args: Namespace) -> dict:
                 results[board].append(thread_no)
 
     return results
-
-from src.core.posts import get_thread_info
 
 def build_thread_links(results: dict) -> dict:
     links = {}
@@ -97,6 +95,8 @@ def build_thread_links(results: dict) -> dict:
 
 def save_links(links: dict, file: str):
     try:
+        if file == None:
+            return
         with open(file, "w", encoding="utf-8") as f:
             for board, link_list in links.items():
                 f.write(f"[Board {board}]\n")

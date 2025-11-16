@@ -3,9 +3,9 @@
 
     **Author:** JuaanReis       
     **Date:** 25-09-2025        
-    **Last modification:** 12-11-2025       
+    **Last modification:** 15-11-2025       
     **E-mail:** teixeiradosreisjuan@gmail.com       
-    **Version:** 1.1.3b3        
+    **Version:** 1.1.4rc1        
 
     **Example:**
         ```python
@@ -15,13 +15,32 @@
         ```
 """
 from src.flags import parse_args
+from concurrent.futures import ThreadPoolExecutor
 from colorama import Fore, Style, init
+from argparse import Namespace
 init(autoreset=True) 
 
 with open("./src/output/version.txt", "r") as f:
     version = f.read()
 
-def banner_logo():
+nsfw_boards = [
+    "h",
+    "e",
+    "u",
+    "d",
+    "s",
+    "hc",
+    "hm",
+    "y",
+    "t",
+    "gif",
+    "r",
+    "hr",
+    "i",
+    "aco"
+]
+
+def banner_logo() -> str:
     with open("./src/output/banner.txt", "r") as f:
         logo = f.read()
     return logo
@@ -50,25 +69,40 @@ def print_line(msg: str, size: int = 10, banner: str = ""):
 def banner_info():
     print_line(f"pepeScreper {version}", 35, banner_logo())
 
-def display_links(links: dict):
+def process_thread(board, thread, args):
+    url = thread.get("url", "unknown")
+
+    if board in nsfw_boards and not args.nsfw_title:
+        title = f"{Fore.RED}[Title blocked on NSFW boards]{Style.RESET_ALL}"
+    else:
+        title = thread.get("title", "Title not found")
+
+    return f"{Fore.GREEN}[+] {Style.RESET_ALL}{Fore.YELLOW}{url}{Style.RESET_ALL} -> {Fore.MAGENTA}{title}{Style.RESET_ALL}"
+
+def display_links(links: dict, args: Namespace):
     for board, thread_links in links.items():
         print()
-        print(f"{Fore.CYAN}[Board {board}]{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}[Board {board}]{Style.RESET_ALL} → {len(thread_links)} results")
         print("-" * (8 + len(board)))
 
-        if thread_links:
-            for thread in thread_links:
-                url = thread.get("url", "unknown")
-                title = thread.get("title", "No title")
-
-                print(
-                    f"{Fore.GREEN}[+] {Style.RESET_ALL}"
-                    f"{Fore.YELLOW}{url}{Style.RESET_ALL} -> "
-                    f"{Fore.MAGENTA}{title}{Style.RESET_ALL}"
-                )
-                
-        else:
+        if not thread_links:
             print(f"{Fore.RED}[-] Link not found{Style.RESET_ALL}")
+            print()
+            continue
+
+        results = []
+
+        with ThreadPoolExecutor(max_workers=args.threads) as executor:
+            futures = [
+                executor.submit(process_thread, board, thread, args)
+                for thread in thread_links
+            ]
+
+            for fut in futures:
+                results.append(fut.result())
+
+        for line in results:
+            print(line)
 
         print()
 

@@ -1,22 +1,36 @@
-import json
+"""
+    Function that returns all threads and their information.
+
+    **Author:** JuaanReis           
+    **Date:** 25-09-2025            
+    **Last modification:** 15-11-2025           
+    **E-mail:** teixeiradosreisjuan@gmail.com           
+    **Version:** 1.1.4rc1            
+
+    **Example:**
+        ```python
+    from src.core.post import get_post_thread
+    threads_data = get_post_thread(board_args)
+        ```
+"""
+import orjson as json
 from src.network.get_all_boards import get_response
 from concurrent.futures import ThreadPoolExecutor
 import config
 from tqdm import tqdm
-
 tqdm._instances.clear()
 
 def get_post() -> list:
     try:
         with open("./src/data/boards.json", "r") as f:
-            data = json.load(f)
+            data = json.loads(f.read())
         return [board["board"] for board in data["boards"]]
     except FileNotFoundError as e:
         if config.debug:
             print(f"[ERROR FILE POST]: {e}")
         return []
     
-def get_post_thread(selected_boards: list[str] | None = None) -> dict:
+def get_post_thread(selected_boards: list[str] | None = None, workers = 20) -> dict:
     boards = get_post()
 
     if selected_boards:
@@ -26,7 +40,7 @@ def get_post_thread(selected_boards: list[str] | None = None) -> dict:
 
     def fetch_boards(b):
         api_url = f"https://a.4cdn.org/{b}/catalog.json"
-        response = get_response(api_url)
+        response = get_response(api_url, 5, 0.2)
 
         if config.debug:
             tqdm.write(f"[REQUEST API] {api_url}")
@@ -50,9 +64,9 @@ def get_post_thread(selected_boards: list[str] | None = None) -> dict:
 
         return b, threads
 
-    boards_iter = boards if config.debug else tqdm(boards, desc="Processing boards", ncols=100)
+    boards_iter = boards if config.debug else tqdm(boards, desc="Processing boards", colour="cyan", ncols=100)
 
-    with ThreadPoolExecutor(max_workers=30) as executor:
+    with ThreadPoolExecutor(max_workers=workers) as executor:
         results = list(executor.map(fetch_boards, boards_iter))
 
     for b, threads in results:

@@ -3,9 +3,9 @@
 
     **Author:** JuaanReis  
     **Date:** 25-09-2025  
-    **Last modification:** 08-10-2025  
+    **Last modification:** 15-11-2025  
     **E-mail:** teixeiradosreisjuan@gmail.com  
-    **Version:** 1.1.3b2  
+    **Version:** 1.1.4rc1  
 
     **Example:**
         ```python
@@ -20,12 +20,17 @@
 from datetime import datetime
 import re, json
 
-def keywords_no_nsfw() -> list:
-    with open(r"src\core\no_nfsw.json", "r") as f:
-        nfsw_keywords = json.load(f)
-    return nfsw_keywords
+def extract_content(posts_to_check):
+    for p in posts_to_check:
+        com = p.get("com", "")
+        if com:
+            yield com.lower()
 
-nfsw_keywords = keywords_no_nsfw()
+def keywords_no_nsfw() -> list:
+    with open(r"src\core\no_nsfw.json", "r") as f:
+        return json.load(f)
+
+nsfw_keywords = keywords_no_nsfw()
 
 def thread_matches(thread_info, args):
     if not thread_info:
@@ -34,21 +39,30 @@ def thread_matches(thread_info, args):
     posts = thread_info.get("posts", [])
     if not posts:
         return False
+    
+    allow_nsfw = getattr(args, "nsfw", True)
+
+    board = thread_info.get("board", "").lower()
+    nsfw_boards = {"a","h","e","u","d","s","hc","hm","y","t","gif","r","hr","wg"}
+
+    if not allow_nsfw:
+        if board in nsfw_boards:
+            return False
 
     timestamp = posts[0].get("time")
     if timestamp:
         post_date = datetime.utcfromtimestamp(timestamp)
+
         if args.date:
-            filter_date = datetime.strptime(args.date, "%Y/%m/%d")
-            if post_date.date() != filter_date.date():
+            if post_date.date() != datetime.strptime(args.date, "%Y/%m/%d").date():
                 return False
+
         if args.before:
-            before_date = datetime.strptime(args.before, "%Y/%m/%d")
-            if post_date.date() >= before_date.date():
+            if post_date.date() >= datetime.strptime(args.before, "%Y/%m/%d").date():
                 return False
+
         if args.after:
-            after_date = datetime.strptime(args.after, "%Y/%m/%d")
-            if post_date.date() <= after_date.date():
+            if post_date.date() <= datetime.strptime(args.after, "%Y/%m/%d").date():
                 return False
 
     replies = posts[0].get("replies", 0)
@@ -57,30 +71,46 @@ def thread_matches(thread_info, args):
     if args.max_replies and replies > args.max_replies:
         return False
 
-    if getattr(args, "op_only", False):  
-        posts_to_check = posts[:1] 
+    if getattr(args, "op_only", False):
+        posts_to_check = posts[:1]
     elif getattr(args, "no_op", False):
         posts_to_check = posts[1:]
     else:
-        posts_to_check = posts  
+        posts_to_check = posts
 
-    if getattr(args, "no_nsfw", False):
+    if not allow_nsfw:
         for post in posts_to_check:
             if post.get("rating", "").lower() == "nsfw":
                 return False
 
             content_lower = post.get("com", "").lower()
-            if any(word in content_lower for word in nfsw_keywords):
+            if any(word in content_lower for word in nsfw_keywords):
                 return False
-
-    content = " ".join([post.get("com", "") for post in posts_to_check])
+            
     if args.key:
-        content_lower = content.lower()
-        if args.key and not any(word.lower() in content_lower for word in args.key):
+        keys_lower = [k.lower() for k in args.key]
+        found_key = False
+
+        for com in extract_content(posts_to_check):
+            if any(k in com for k in keys_lower):
+                found_key = True
+                break
+
+        if not found_key:
             return False
+
     if args.exclude:
-        for ex in re.split(r"[,\s]+", args.exclude.strip()):
-            if ex.lower().strip() in content:
-                return False
+        excludes = [
+            ex.strip().lower()
+            for ex in re.split(r"[,\s]+", args.exclude)
+            if ex.strip()
+        ]
+
+        for post in posts_to_check:
+            content_lower = post.get("com", "").lower()
+            for ex in excludes:
+                if re.search(rf"(?<!\w){re.escape(ex)}(?!\w)", content_lower):
+                    return False
+
 
     return True
