@@ -3,9 +3,9 @@
 
     **Author:** JuaanReis       
     **Date:** 25-09-2025        
-    **Last modification:** 15-11-2025       
+    **Last modification:** 17-11-2025         
     **E-mail:** teixeiradosreisjuan@gmail.com       
-    **Version:** 1.1.4rc1        
+    **Version:** 1.1.5        
 
     **Example:**
         ```python
@@ -15,13 +15,13 @@
         ```
 """
 from src.flags import parse_args
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from colorama import Fore, Style, init
 from argparse import Namespace
+from src.flags import parse_args
+from os import cpu_count
+from config import logo, output_print
 init(autoreset=True) 
-
-with open("./src/output/version.txt", "r") as f:
-    version = f.read()
 
 nsfw_boards = [
     "h",
@@ -41,9 +41,12 @@ nsfw_boards = [
 ]
 
 def banner_logo() -> str:
-    with open("./src/output/banner.txt", "r") as f:
-        logo = f.read()
-    return logo
+    if logo:
+        with open("./src/output/banner.txt", "r") as f:
+            logo_art = f.read()
+    else:
+        logo_art = ""
+    return logo_art
 
 def print_line(msg: str, size: int = 10, banner: str = ""):
     print("_" * size, msg, "_" * size)
@@ -67,7 +70,10 @@ def print_line(msg: str, size: int = 10, banner: str = ""):
     print("‾" * ((size * 2) + len(msg) + 2))
 
 def banner_info():
-    print_line(f"pepeScreper {version}", 35, banner_logo())
+    if output_print:
+        with open("./src/output/version.txt", "r") as f:
+            version = f.read()
+        print_line(f"pepeScreper {version}", 35, banner_logo())
 
 def process_thread(board, thread, args):
     url = thread.get("url", "unknown")
@@ -80,10 +86,13 @@ def process_thread(board, thread, args):
     return f"{Fore.GREEN}[+] {Style.RESET_ALL}{Fore.YELLOW}{url}{Style.RESET_ALL} -> {Fore.MAGENTA}{title}{Style.RESET_ALL}"
 
 def display_links(links: dict, args: Namespace):
+    args = parse_args()
+    max_threads = min(args.threads, cpu_count() * 5)
     for board, thread_links in links.items():
         print()
-        print(f"{Fore.CYAN}[Board {board}]{Style.RESET_ALL} → {len(thread_links)} results")
-        print("-" * (8 + len(board)))
+        if output_print:
+            print(f"{Fore.CYAN}[Board {board}]{Style.RESET_ALL} → {len(thread_links)} results")
+            print("-" * (8 + len(board)))
 
         if not thread_links:
             print(f"{Fore.RED}[-] Link not found{Style.RESET_ALL}")
@@ -92,13 +101,13 @@ def display_links(links: dict, args: Namespace):
 
         results = []
 
-        with ThreadPoolExecutor(max_workers=args.threads) as executor:
-            futures = [
-                executor.submit(process_thread, board, thread, args)
+        with ThreadPoolExecutor(max_workers=max_threads) as executor:
+            futures = {
+                executor.submit(process_thread, board, thread, args): thread
                 for thread in thread_links
-            ]
+            }
 
-            for fut in futures:
+            for fut in as_completed(futures):
                 results.append(fut.result())
 
         for line in results:

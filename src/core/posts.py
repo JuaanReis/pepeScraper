@@ -3,9 +3,9 @@
 
     **Author:** JuaanReis           
     **Date:** 25-09-2025            
-    **Last modification:** 15-11-2025           
+    **Last modification:** 17-11-2025             
     **E-mail:** teixeiradosreisjuan@gmail.com           
-    **Version:** 1.1.4rc1            
+    **Version:** 1.1.5            
 
     **Example:**
         ```python
@@ -30,47 +30,48 @@ def get_post() -> list:
             print(f"[ERROR FILE POST]: {e}")
         return []
     
-def get_post_thread(selected_boards: list[str] | None = None, workers = 20) -> dict:
+def get_post_thread(selected_boards: list[str] | None = None, workers=20) -> dict:
     boards = get_post()
 
     if selected_boards:
-        boards = [b for b in boards if b in selected_boards]
+        selected = set(selected_boards)
+        boards = [b for b in boards if b in selected]
 
     all_threads = {}
 
     def fetch_boards(b):
         api_url = f"https://a.4cdn.org/{b}/catalog.json"
-        response = get_response(api_url, 5, 0.2)
 
         if config.debug:
-            tqdm.write(f"[REQUEST API] {api_url}")
+            print(f"[REQUEST API] {api_url}")
+
+        response = get_response(api_url, 2, 0.5)
 
         if not response:
             if config.debug:
-                tqdm.write(f"[ERROR RESPONSE API] No response from {api_url}")
-            return b, []
+                print(f"[ERROR RESPONSE API] No response from {api_url}")
+            return (b, ())
 
         try:
             catalog = response.json()
         except ValueError:
             if config.debug:
-                tqdm.write(f"[ERROR JSON API] Invalid JSON {api_url}")
-            return b, []
+                print(f"[ERROR JSON API] Invalid JSON {api_url}")
+            return (b, ())
 
-        threads = [thread["no"] for page in catalog for thread in page.get("threads", [])]
+        threads = tuple(thread["no"]
+                        for page in catalog
+                        for thread in page.get("threads", []))
 
-        if config.debug:
-            tqdm.write(f"[THREAD COUNT] {len(threads)} in {b}")
+        return (b, threads)
 
-        return b, threads
+    boards_iter = tqdm(boards, desc="Processing boards", colour="cyan", ncols=100) if not config.debug else boards
 
-    boards_iter = boards if config.debug else tqdm(boards, desc="Processing boards", colour="cyan", ncols=100)
+    max_workers = min(workers, config.max_threads)
 
-    with ThreadPoolExecutor(max_workers=workers) as executor:
-        results = list(executor.map(fetch_boards, boards_iter))
-
-    for b, threads in results:
-        all_threads[b] = threads
+    with ThreadPoolExecutor(max_workers=max_workers) as exe:
+        for b, threads in exe.map(fetch_boards, boards_iter):
+            all_threads[b] = threads
 
     return all_threads
 

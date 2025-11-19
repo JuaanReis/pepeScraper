@@ -3,9 +3,9 @@
 
     **Author:** JuaanReis       
     **Date:** 25-09-2025        
-    **Last modification:** 15-11-2025        
+    **Last modification:** 17-11-2025          
     **E-mail:** teixeiradosreisjuan@gmail.com       
-    **Version:** 1.1.4rc1            
+    **Version:** 1.1.5            
 
     **Example:**
         ```python
@@ -18,7 +18,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.core.matcher import thread_matches
 from argparse import Namespace
 from tqdm import tqdm
-from config import debug
+import config
 
 def search_threads(args: Namespace) -> dict:
     board_args = args.board if args.board else None
@@ -45,7 +45,7 @@ def search_threads(args: Namespace) -> dict:
     if total_tasks == 0:
         return results
 
-    with ThreadPoolExecutor(max_workers=args.threads) as executor:
+    with ThreadPoolExecutor(max_workers=args.threads if args.threads <= config.max_threads else config.max_threads) as executor:
         futures = {executor.submit(get_thread_info, board, thread_no): (board, thread_no) for board, thread_no in tasks}
 
         for future in tqdm(as_completed(futures), total=total_tasks, desc="Processing threads", colour="green", ncols=100):
@@ -106,5 +106,5 @@ def save_links(links: dict, file: str):
                 f.write("\n")
         print("...")
     except Exception as e:
-        if debug:
+        if config.debug:
             print(f"[ERROR SAVE RESULT]: {e}")

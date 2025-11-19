@@ -4,9 +4,9 @@
 
     **Author:** JuaanReis       
     **Date:** 28-08-2025        
-    **Last modification:** 15-11-2025       
+    **Last modification:** 17-11-2025         
     **E-mail:** teixeiradosreisjuan@gmail.com           
-    **Version:** 1.1.4rc1        
+    **Version:** 1.1.5        
 
     **Example:**
         ```python
@@ -24,46 +24,68 @@ import orjson as json
 import config
 import time
 
-client = httpx.Client(http2=True, timeout=httpx.Timeout(5.0, connect=2.5), limits=httpx.Limits(max_keepalive_connections=100, max_connections=200), headers={"Connection": "keep-alive", "Accept-Encoding": "gzip"})
+client = config.client
 
-def get_response(url: str, retries: int = 3, delay: float = 1.0) -> httpx.Response | None:
+def get_response(url: str, retries: int = 3, delay: float = 0.5) -> httpx.Response | None:
     for attempt in range(retries):
         try:
             response = client.get(url)
             response.raise_for_status()
-            return response                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+            return response
+
+        except httpx.HTTPStatusError as e:
+            status = e.response.status_code
+            if status == 429:
+                retry_after = int(e.response.headers.get("Retry-After", 1))
+                if config.debug:
+                    print(f"[429 RATE LIMIT] {url} -> retry in {retry_after}s")
+                time.sleep(retry_after)
+                continue
+
+            if config.debug:
+                print(f"[HTTP STATUS ERROR] {url} -> {status}")
+            return None
 
         except httpx.ConnectError as e:
-            if "10035" in str(e):
+            msg = str(e)
+
+            if "10035" in msg:
                 if config.debug:
-                    print(f"[SOCKET BUSY] {url} -> retry {attempt+1}/{retries} in {delay}s")
-                time.sleep(delay)
+                    print(f"[SOCKET BUSY] {url} -> retry {attempt+1}/{retries}")
+                time.sleep(delay * (1 + attempt * 0.75))
                 continue
+
+            if "Name or service not known" in msg:
+                if config.debug:
+                    print(f"[DNS FAIL] {url}")
+                return None
+
             if config.debug:
                 print(f"[CONNECT ERROR] {url} -> {e}")
-            time.sleep(delay)
+            time.sleep(delay * (1 + attempt * 0.75))
             continue
 
         except httpx.RequestError as e:
             if config.debug:
                 print(f"[REQUEST ERROR] {url} -> {e}")
-            time.sleep(delay)
+            time.sleep(delay * (1 + attempt * 0.75))
             continue
-
-        except httpx.HTTPStatusError as e:
-            if config.debug:
-                print(f"[HTTP STATUS ERROR] {url} -> {e.response.status_code}")
-            return None
 
         except Exception as e:
             if config.debug:
                 print(f"[UNEXPECTED ERROR] {url} -> {e}")
-            time.sleep(delay)
+            time.sleep(delay * (1 + attempt * 0.75))
             continue
+
+    try:
+        return client.get(url, timeout=10)
+    except:
+        pass
 
     if config.debug:
         print(f"[FAILED AFTER RETRIES] {url}")
     return None
+
 
 def get_boards_api() -> dict:
     start = time.time()
@@ -73,12 +95,20 @@ def get_boards_api() -> dict:
         if config.debug and boards is not None:
             print(f"[API STATUS] {boards.status_code}")
         return
-        
+
+    data = json.dumps(
+        boards.json(),
+        option=json.OPT_INDENT_2 
+    )
+
     with open("./src/data/boards.json", "wb") as f:
-        f.write(json.dumps(boards.json()))
-    
+        f.write(data)
+
     end = time.time()
 
     print(f"save in {end - start:.2f}s")
-    
+
     return boards.json()
+
+if __name__ == "__main__":
+    get_boards_api()
