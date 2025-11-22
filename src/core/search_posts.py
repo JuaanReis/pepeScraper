@@ -3,7 +3,7 @@
 
     **Author:** JuaanReis       
     **Date:** 25-09-2025        
-    **Last modification:** 17-11-2025          
+    **Last modification:** 21-11-2025          
     **E-mail:** teixeiradosreisjuan@gmail.com       
     **Version:** 1.1.5            
 
@@ -18,7 +18,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.core.matcher import thread_matches
 from argparse import Namespace
 from tqdm import tqdm
+from colorama import Fore
 import config
+from src.utils.color import colorize
 
 def search_threads(args: Namespace) -> dict:
     board_args = args.board if args.board else None
@@ -45,10 +47,10 @@ def search_threads(args: Namespace) -> dict:
     if total_tasks == 0:
         return results
 
-    with ThreadPoolExecutor(max_workers=args.threads if args.threads <= config.max_threads else config.max_threads) as executor:
+    with ThreadPoolExecutor(max_workers = min(args.threads, config.max_threads * config.thread_multiplier)) as executor:
         futures = {executor.submit(get_thread_info, board, thread_no): (board, thread_no) for board, thread_no in tasks}
 
-        for future in tqdm(as_completed(futures), total=total_tasks, desc="Processing threads", colour="green", ncols=100):
+        for future in tqdm(as_completed(futures), total=total_tasks, desc="Processing threads", bar_format=config.color_ansi + "{l_bar}{bar}{r_bar}" + "\033[0m", ncols=100):
             board, thread_no = futures[future]
             try:
                 thread_info = future.result()
@@ -104,7 +106,58 @@ def save_links(links: dict, file: str):
                 for link in link_list:
                     f.write(f"{link}\n")
                 f.write("\n")
-        print("...")
+        print(f"Results saved in {file}")
     except Exception as e:
         if config.debug:
             print(f"[ERROR SAVE RESULT]: {e}")
+
+def save_log(links: dict, args: Namespace):
+    if config.logs:
+        import os
+        from datetime import datetime
+        try:
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            filename = f"log_{timestamp}.log"
+
+            os.makedirs("./src/data/logs", exist_ok=True)
+            filepath = os.path.join("./src/data/logs", filename)
+
+            with open(filepath, "w", encoding="utf-8") as f:
+
+                f.write("==============================================\n")
+                f.write("                PEPESCRAPER LOG               \n")
+                f.write("==============================================\n")
+
+                now = datetime.now()
+                f.write(f"DATE: {now.strftime('%Y/%m/%d')}\n")
+                f.write(f"HOUR: {now.strftime('%H:%M:%S')}\n")
+
+                f.write("\n[ARGS]\n")
+                f.write("------------------------------------------\n")
+                for key, value in vars(args).items():
+                    f.write(f"{key}: {value}\n")
+
+                f.write("\n")
+
+                for board, link_list in links.items():
+
+                    f.write(f"\n[Board {board}] ({len(link_list)} threads)\n")
+                    f.write("------------------------------------------\n")
+
+                    for idx, link_data in enumerate(link_list, start=1):
+                        url = link_data.get("url", "N/A")
+                        title = link_data.get("title", "[No title]")
+                        comment = link_data.get("comment", "")
+
+                        f.write(f"#{idx}\n")
+                        f.write(f"URL: {url}\n")
+                        f.write(f"TITLE: {title}\n")
+                        f.write(f"COMMENT:\n{comment}\n")
+                        f.write("------------------------------------------\n")
+
+            if config.debug:
+                print(f"[LOG SALVO]: {filepath}")
+
+        except Exception as e:
+            if config.debug:
+                print(f"[ERROR SAVE LOG]: {e}")

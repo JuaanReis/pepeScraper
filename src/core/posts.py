@@ -3,7 +3,7 @@
 
     **Author:** JuaanReis           
     **Date:** 25-09-2025            
-    **Last modification:** 17-11-2025             
+    **Last modification:** 21-11-2025             
     **E-mail:** teixeiradosreisjuan@gmail.com           
     **Version:** 1.1.5            
 
@@ -18,6 +18,8 @@ from src.network.get_all_boards import get_response
 from concurrent.futures import ThreadPoolExecutor
 import config
 from tqdm import tqdm
+from colorama import Fore
+from src.utils.color import colorize
 tqdm._instances.clear()
 
 def get_post() -> list:
@@ -65,9 +67,9 @@ def get_post_thread(selected_boards: list[str] | None = None, workers=20) -> dic
 
         return (b, threads)
 
-    boards_iter = tqdm(boards, desc="Processing boards", colour="cyan", ncols=100) if not config.debug else boards
+    boards_iter = tqdm(boards, desc="Processing boards", bar_format=config.color_ansi + "{l_bar}{bar}{r_bar}" + "\033[0m", ncols=100) if not config.debug else boards
 
-    max_workers = min(workers, config.max_threads)
+    max_workers = min(workers, config.max_threads * config.thread_multiplier)
 
     with ThreadPoolExecutor(max_workers=max_workers) as exe:
         for b, threads in exe.map(fetch_boards, boards_iter):

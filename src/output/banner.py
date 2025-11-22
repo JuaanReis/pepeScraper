@@ -1,70 +1,56 @@
-"""
-    Function for styling and information on the use of the program when running it.
+""" 
+    Function for styling and information on the use of the program when running it. 
 
     **Author:** JuaanReis       
     **Date:** 25-09-2025        
-    **Last modification:** 17-11-2025         
+    **Last modification:** 21-11-2025       
     **E-mail:** teixeiradosreisjuan@gmail.com       
-    **Version:** 1.1.5        
+    **Version:** 1.1.6            
 
-    **Example:**
-        ```python
-    from output.banner import banner_info
+    **Example:**        
+    ```python
+        from output.banner import banner_info
     
-    banner_info()
-        ```
+        banner_info()
+    ```
 """
-from src.flags import parse_args
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from colorama import Fore, Style, init
+
 from argparse import Namespace
-from src.flags import parse_args
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from colorama import Fore, init
 from os import cpu_count
-from config import logo, output_print
-init(autoreset=True) 
+from src.flags import parse_args
+from src.utils.color import colorize
+from config import logo, output_print, color_ansi
+
+init(autoreset=True)
 
 nsfw_boards = [
-    "h",
-    "e",
-    "u",
-    "d",
-    "s",
-    "hc",
-    "hm",
-    "y",
-    "t",
-    "gif",
-    "r",
-    "hr",
-    "i",
-    "aco"
+    "h", "e", "u", "d", "s", "hc", "hm", "y", "t",
+    "gif", "r", "hr", "i", "aco"
 ]
 
 def banner_logo() -> str:
     if logo:
         with open("./src/output/banner.txt", "r") as f:
-            logo_art = f.read()
-    else:
-        logo_art = ""
-    return logo_art
+            return f.read()
+    return ""
 
 def print_line(msg: str, size: int = 10, banner: str = ""):
     print("_" * size, msg, "_" * size)
-    print(banner) 
+    print(banner)
     print()
+
     args = parse_args()
     args_dict = vars(args)
-    max_len = max(len(flag) for flag in args_dict.keys())
-    args = parse_args()
-    args_dict = vars(args)
-    
+
     max_len = max(len(flag) for flag in args_dict.keys())
 
     print("‾" * ((size * 2) + len(msg) + 2))
-    
+
     for flag, value in args_dict.items():
         if value is not None:
-            print(f"  $ {flag.ljust(max_len)} : {value}")
+            print(f"  $ {flag.ljust(max_len)} : {color_ansi}{value}\033[0m")
 
     print()
     print("‾" * ((size * 2) + len(msg) + 2))
@@ -72,30 +58,43 @@ def print_line(msg: str, size: int = 10, banner: str = ""):
 def banner_info():
     if output_print:
         with open("./src/output/version.txt", "r") as f:
-            version = f.read()
-        print_line(f"pepeScreper {version}", 35, banner_logo())
+            version = f.read().strip()
 
-def process_thread(board, thread, args):
+        print_line(
+            colorize(f"pepeScreper {version}", Fore.GREEN),
+            35,
+            colorize(banner_logo(), "\033[37m")
+        )
+
+def process_thread(board, thread, args) -> str:
     url = thread.get("url", "unknown")
 
     if board in nsfw_boards and not args.nsfw_title:
-        title = f"{Fore.RED}[Title blocked on NSFW boards]{Style.RESET_ALL}"
+        title = colorize("[Title blocked on NSFW boards]", Fore.RED)
     else:
         title = thread.get("title", "Title not found")
 
-    return f"{Fore.GREEN}[+] {Style.RESET_ALL}{Fore.YELLOW}{url}{Style.RESET_ALL} -> {Fore.MAGENTA}{title}{Style.RESET_ALL}"
+    return (
+        f"{colorize('[+]', Fore.GREEN)} "
+        f"{colorize(url, Fore.YELLOW)} -> "
+        f"{colorize(title, Fore.MAGENTA if not board in nsfw_boards else Fore.RED)}"
+    )
 
 def display_links(links: dict, args: Namespace):
-    args = parse_args()
     max_threads = min(args.threads, cpu_count() * 5)
+
     for board, thread_links in links.items():
         print()
+
         if output_print:
-            print(f"{Fore.CYAN}[Board {board}]{Style.RESET_ALL} → {len(thread_links)} results")
+            print(
+                f"{colorize(f'[Board {board}]', Fore.CYAN)} → "
+                f"{colorize(str(len(thread_links)), Fore.YELLOW)} results"
+            )
             print("-" * (8 + len(board)))
 
         if not thread_links:
-            print(f"{Fore.RED}[-] Link not found{Style.RESET_ALL}")
+            print(colorize("[-] Link not found", Fore.RED))
             print()
             continue
 

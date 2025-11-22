@@ -1,22 +1,25 @@
 from src.output.banner import banner_info, display_links
-from src.core.search_posts import search_threads, build_thread_links, save_links
+from src.core.search_posts import search_threads, build_thread_links, save_links, save_log
 from src.flags import parse_args
-import time
+from config import color_ansi 
+from time import time
 
 def main():
+    start_run = time()
     args = parse_args()
     banner_info()
-    start = time.time()
+    start = time()
     results = search_threads(args)
-    end = time.time()
+    end = time()
     links = build_thread_links(results)
+    save_log(links, args)
     display_links(links, args)
-    if args.output != "":
+    if args.output is not None:
         save_links(links, args.output)
-    else:
-        print()
+    end_run = time()
 
-    print(f"Task completed in {end - start:.2f}s")
+    print(f"Requests made in {color_ansi}{end - start:.2f}\033[0ms")
+    print(f"Task completed in {color_ansi}{end_run - start_run:.2f}\033[0ms")
             
 if __name__ == "__main__":
     main()
