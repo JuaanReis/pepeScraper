@@ -50,7 +50,7 @@ def print_line(msg: str, size: int = 10, banner: str = ""):
 
     for flag, value in args_dict.items():
         if value is not None:
-            print(f"  $ {flag.ljust(max_len)} : {color_ansi}{value}\033[0m")
+            print(f"  {colorize("$", Fore.GREEN)} {flag.ljust(max_len)} : {color_ansi}{value}\033[0m")
 
     print()
     print("‾" * ((size * 2) + len(msg) + 2))
@@ -61,7 +61,7 @@ def banner_info():
             version = f.read().strip()
 
         print_line(
-            colorize(f"pepeScreper {version}", Fore.GREEN),
+            colorize(f"pepeScraper {version} ", Fore.GREEN),
             35,
             colorize(banner_logo(), "\033[37m")
         )
@@ -76,7 +76,7 @@ def process_thread(board, thread, args) -> str:
 
     return (
         f"{colorize('[+]', Fore.GREEN)} "
-        f"{colorize(url, Fore.YELLOW)} -> "
+        f"{colorize(url, Fore.YELLOW)} → "
         f"{colorize(title, Fore.MAGENTA if not board in nsfw_boards else Fore.RED)}"
     )
 

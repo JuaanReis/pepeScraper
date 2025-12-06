@@ -18,9 +18,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.core.matcher import thread_matches
 from argparse import Namespace
 from tqdm import tqdm
-from colorama import Fore
 import config
-from src.utils.color import colorize
 
 def search_threads(args: Namespace) -> dict:
     board_args = args.board if args.board else None

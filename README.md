@@ -1,4 +1,4 @@
-# pepeScreper - 4chan scraper  <img src="./assets/4chan-logo.png" style="height: 20px; width: 20px; margin: 0 0 0 5px">
+# pepeScraper - 4chan scraper  <img src="./assets/4chan-logo.png" style="height: 20px; width: 20px; margin: 0 0 0 5px">
 
 *A complete scraper for 4chan (Now that's fast.)*
 
@@ -17,27 +17,27 @@ pepeScraper is a scraper that uses context for your searches and returns exactly
 
 ## Weird stuff
 
-[![Stars](https://img.shields.io/github/stars/JuaanReis/pepeScreper?style=social)](https://github.com/JuaanReis/pepeScreper) &nbsp;
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/JuaanReis/pepeScreper/pulls) &nbsp;
-[![Last Commit](https://img.shields.io/github/last-commit/JuaanReis/pepeScreper)](https://github.com/JuaanReis/pepeScreper/commits/main) &nbsp;
+[![Stars](https://img.shields.io/github/stars/JuaanReis/pepeScraper?style=social)](https://github.com/JuaanReis/pepeScraper) &nbsp;
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/JuaanReis/pepeScraper/pulls) &nbsp;
+[![Last Commit](https://img.shields.io/github/last-commit/JuaanReis/pepeScraper)](https://github.com/JuaanReis/pepeScraper/commits/main) &nbsp;
 ![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)&nbsp;
 [![License: GPL](https://img.shields.io/badge/License-GPL-blue.svg)](LICENSE) &nbsp;
-[![Play Random Video](https://img.shields.io/badge/pepeScreper-V1-darkred?style=flat-square&logo=youtube)](https://www.youtube.com/watch?v=dQw4w9WgXcQ) &nbsp;
-[![Play Random Video](https://img.shields.io/badge/pepeScreper-V2-darkred?style=flat-square&logo=youtube)](https://www.youtube.com/watch?v=QwLvrnlfdNo)
+[![Play Random Video](https://img.shields.io/badge/pepeScraper-V1-darkred?style=flat-square&logo=youtube)](https://www.youtube.com/watch?v=dQw4w9WgXcQ) &nbsp;
+[![Play Random Video](https://img.shields.io/badge/pepeScraper-V2-darkred?style=flat-square&logo=youtube)](https://www.youtube.com/watch?v=QwLvrnlfdNo)
 
 ## Installation
 
 If you use Windows, just go to releases and download the latest version and then install the dependencies. *If you want to help and have access to the source code, use the code below.*
 
 ```bash
-    git clone https://JuaanReis/pepeScreper.git
+    git clone https://JuaanReis/pepeScraper.git
     pip install -r requirements.txt
 ```
 
 If you use Linux it will also be the same thing above (but Linux sometimes forces you to use that damn venv) so use the code below.
 
 ```bash
-    git clone https://github.com/JuaanReis/pepeScreper.git
+    git clone https://github.com/JuaanReis/pepeScraper.git
     python3 -m venv venv
     source venv/bin/activate
     pip install -r requirements.txt
@@ -48,7 +48,7 @@ If you use Linux it will also be the same thing above (but Linux sometimes force
 ```
     "--key <w>": keywords used as the base for search and scraping  
     "--thread <n>": 4chan thread where the posts are located  
-    "--exclude <w>": keywords to be excluded from the results  
+    "--exclude, -e <w>": keywords to be excluded from the results  
     "--date <YYYY/MM/DD>": exact date when the OP post was made  
     "--before <YYYY/MM/DD>": posts before the given date up to today  
     "--after <YYYY/MM/DD>": posts after the given date up to today  
@@ -71,7 +71,7 @@ If you use Linux it will also be the same thing above (but Linux sometimes force
 
 ## Privacy and Data Storage
 
-PepeScreper does NOT store anything <br>
+PepeScraper does NOT store anything <br>
 it only uses the API and creates a direct link to 4chan. <br>
 No logs, no history, no databases, no Facebook copy (maybe you understand).
 

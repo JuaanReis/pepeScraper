@@ -25,7 +25,7 @@ def parse_args() -> Namespace | None:
         parse = argparse.ArgumentParser(description="A tool that returns you 4chan boards")
         parse.add_argument("--thread", "-t", type=int, help="-t <nnnnnn>")
         parse.add_argument("--key", "-k", nargs="+", type=str, help="--key <keyword>", required=True)
-        parse.add_argument("--exclude", type=str, help="--exclude <key1, key2, key3>")
+        parse.add_argument("--exclude", "-e", type=str, help="--exclude <key1, key2, key3>")
         parse.add_argument("--date", type=str, help="--date <YYYY/MM/DD>")
         parse.add_argument("--before", type=str, help="--before <YYYY/MM/DD>")
         parse.add_argument("--after", type=str, help="--after <YYYY/MM/DD>")
@@ -38,6 +38,7 @@ def parse_args() -> Namespace | None:
         parse.add_argument("--nsfw", "-n", action="store_true", help="Enable a nsfw contents -no-nsfw <Literal [False]>", default=False)
         parse.add_argument("--output", "-o", type=str, help="Save results in file.txt <n/n/n.txt>")
         parse.add_argument("--nsfw-title", "-nt", action="store_true", help="Enable a title nsfw <Literal [False]>")
+        parse.add_argument("--download_image", "-di", type=str, default="", help="Enable the option to save images from the threads -di <n>")
         args = parse.parse_args()
         return args
     except argparse.ArgumentTypeError:

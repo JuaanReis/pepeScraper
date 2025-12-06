@@ -24,68 +24,39 @@ import orjson as json
 import config
 from time import sleep, time
 
-client = config.client
+def get_response(url: str, retries: int = 3, delay: float = config.delay):
 
-def get_response(url: str, retries: int = 3, delay: float = config.delay) -> Response | None:
+    rr = 0  
+
     for attempt in range(retries):
+
+        c = config.clients[rr % len(config.clients)]
+        rr += 1
+
         try:
-            response = client.get(url)
+            response = c.get(url)
             response.raise_for_status()
             return response
 
         except HTTPStatusError as e:
             status = e.response.status_code
+
             if status == 429:
                 retry_after = int(e.response.headers.get("Retry-After", 1))
-                if config.debug:
-                    print(f"[429 RATE LIMIT] {url} -> retry in {retry_after}s")
                 sleep(retry_after)
                 continue
 
-            if config.debug:
-                print(f"[HTTP STATUS ERROR] {url} -> {status}")
             return None
 
-        except ConnectError as e:
-            msg = str(e)
-
-            if "10035" in msg:
-                if config.debug:
-                    print(f"[SOCKET BUSY] {url} -> retry {attempt+1}/{retries}")
-                sleep(delay * (1 + attempt * 0.75))
-                continue
-
-            if "Name or service not known" in msg:
-                if config.debug:
-                    print(f"[DNS FAIL] {url}")
-                return None
-
-            if config.debug:
-                print(f"[CONNECT ERROR] {url} -> {e}")
-            sleep(delay * (1 + attempt * 0.75))
+        except (ConnectError, RequestError):
+            sleep(delay * (1 + attempt * 0.5))
             continue
 
-        except RequestError as e:
-            if config.debug:
-                print(f"[REQUEST ERROR] {url} -> {e}")
-            sleep(delay * (1 + attempt * 0.75))
+        except Exception:
+            sleep(delay * (1 + attempt * 0.5))
             continue
 
-        except Exception as e:
-            if config.debug:
-                print(f"[UNEXPECTED ERROR] {url} -> {e}")
-            sleep(delay * (1 + attempt * 0.75))
-            continue
-
-    try:
-        return client.get(url, timeout=10)
-    except:
-        pass
-
-    if config.debug:
-        print(f"[FAILED AFTER RETRIES] {url}")
     return None
-
 
 def get_boards_api() -> dict:
     start = time()
@@ -106,9 +77,7 @@ def get_boards_api() -> dict:
 
     end = time()
 
-    print(f"save in {end - start:.2f}s")
-
     return boards.json()
 
-if __name__ == "__main__":
+if config.auto_update:
     get_boards_api()

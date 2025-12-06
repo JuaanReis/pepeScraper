@@ -14,24 +14,33 @@
         ```
 """
 import orjson as json
-from src.network.get_all_boards import get_response
+from src.network.get_all_boards import get_response, get_boards_api
 from concurrent.futures import ThreadPoolExecutor
 import config
 from tqdm import tqdm
-from colorama import Fore
-from src.utils.color import colorize
 tqdm._instances.clear()
 
 def get_post() -> list:
+    # Tenta ler as boards
     try:
         with open("./src/data/boards.json", "r") as f:
             data = json.loads(f.read())
         return [board["board"] for board in data["boards"]]
-    except FileNotFoundError as e:
-        if config.debug:
-            print(f"[ERROR FILE POST]: {e}")
-        return []
-    
+
+    except (FileNotFoundError, json.JSONDecodeError):
+        boards = get_boards_api()  
+
+        if not boards:
+            raise RuntimeError("Failed to download boards: get_boards_api() returned empty." if config.debug else "")
+
+        try:
+            with open("./src/data/boards.json", "r") as f:
+                data = json.loads(f.read())
+            return [board["board"] for board in data["boards"]]
+
+        except Exception as e:
+            raise RuntimeError(f"Boards.json still invalid after recreation: {e}")
+
 def get_post_thread(selected_boards: list[str] | None = None, workers=20) -> dict:
     boards = get_post()
 
@@ -55,7 +64,7 @@ def get_post_thread(selected_boards: list[str] | None = None, workers=20) -> dic
             return (b, ())
 
         try:
-            catalog = response.json()
+            catalog = json.loads(response.content)
         except ValueError:
             if config.debug:
                 print(f"[ERROR JSON API] Invalid JSON {api_url}")

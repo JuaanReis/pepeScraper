@@ -16,7 +16,6 @@
     ```
 """
 
-from colorama import Style
 from config import color, color_ansi
 
 def colorize(text: str, color_code: str) -> str:
@@ -24,4 +23,4 @@ def colorize(text: str, color_code: str) -> str:
         return text
     elif color_ansi != "":
         return f"{color_ansi}{text}\033[0m"
-    return f"{color_code}{text}{Style.RESET_ALL}"
+    return f"{color_code}{text}\033[0m"

@@ -20,7 +20,7 @@
 from datetime import datetime
 import re, json
 
-with open(r"src\core\no_nsfw.json", "r") as f:
+with open("./src/core/no_nsfw.json", "r") as f:
     NSFW_KEYWORDS = tuple(k.lower() for k in json.load(f))  
 
 NSFW_BOARDS = {"a","h","e","u","d","s","hc","hm","y","t","gif","r","hr","wg"}
