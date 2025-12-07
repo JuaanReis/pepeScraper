@@ -61,6 +61,7 @@ If you use Linux it will also be the same thing above (but Linux sometimes force
     "--nsfw, -n": to enable vulgar posts
     "--nsfw-title, -nt": to enable title vulgar posts
     "--output, -o": to save the results to a text file (on your computer, just the link).
+    "--download_image, -di": download all images from the thread.
 ```
 
 ## Example
@@ -82,7 +83,7 @@ Everything is stored in RAM and deleted when the program finishes. (That's right
 ## Careful with NSFW Content
 
 > I'm serious, pornography can destroy your brain, your body, and your family (no matter how many times I write this, you'll ignore it).
-
+'
 ```bash
     python main.py --keyword "pepe" --exclude "nsfw" --date 01-01-1970
 ```
