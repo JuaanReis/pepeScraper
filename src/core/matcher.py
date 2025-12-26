@@ -3,9 +3,9 @@
 
     **Author:** JuaanReis  
     **Date:** 25-09-2025  
-    **Last modification:** 17-11-2025    
+    **Last modification:** 25-12-2025    
     **E-mail:** teixeiradosreisjuan@gmail.com  
-    **Version:** 1.1.5  
+    **Version:**  1.1.5rc2 
 
     **Example:**
         ```python
@@ -17,27 +17,77 @@
         ```
 """
 
+import re
 from datetime import datetime
-import re, json
+import json
 
 with open("./src/core/no_nsfw.json", "r") as f:
-    NSFW_KEYWORDS = tuple(k.lower() for k in json.load(f))  
+    NSFW_KEYWORDS = tuple(k.lower() for k in json.load(f))
 
 NSFW_BOARDS = {"a","h","e","u","d","s","hc","hm","y","t","gif","r","hr","wg"}
 
-def build_exclude_regex(excludes_str: str):
-    
-    parts = [
-        re.escape(ex.strip().lower())
-        for ex in re.split(r"[,\s]+", excludes_str)
-        if ex.strip()
-    ]
+def check_date(timestamp, args):
+    if not timestamp:
+        return True
 
-    if not parts:
-        return None
-    
-    pattern = r"(?<!\w)(?:%s)(?!\w)" % "|".join(parts)
-    return re.compile(pattern)
+    post_date = datetime.utcfromtimestamp(timestamp).date()
+
+    if args.date and post_date != args.date:
+        return False
+    if args.before and post_date >= args.before:
+        return False
+    if args.after and post_date <= args.after:
+        return False
+
+    return True
+
+def check_replies(replies, args):
+    if args.min_replies and replies < args.min_replies:
+        return False
+    if args.max_replies and replies > args.max_replies:
+        return False
+    return True
+
+def select_posts(posts, args):
+    if args.op_only:
+        return posts[:1]
+    if args.no_op:
+        return posts[1:]
+    return posts
+
+def check_nsfw(posts, allow_nsfw):
+    if allow_nsfw:
+        return True
+
+    for p in posts:
+        com = (p.get("com") or "").lower()
+
+        if p.get("rating", "").lower() == "nsfw":
+            return False
+
+        if any(w in com for w in NSFW_KEYWORDS):
+            return False
+
+    return True
+
+def contains_keywords(posts, keys):
+    if not keys:
+        return True
+
+    for p in posts:
+        text = (p.get("com") or "").lower()
+        if any(k in text for k in keys):
+            return True
+    return False
+
+def contains_excluded(posts, ex_re):
+    if not ex_re:
+        return False
+    for p in posts:
+        com = (p.get("com") or "")
+        if com and ex_re.search(com.lower()):
+            return True
+    return False
 
 def thread_matches(thread_info, args):
     if not thread_info:
@@ -47,65 +97,38 @@ def thread_matches(thread_info, args):
     if not posts:
         return False
 
-    allow_nsfw = getattr(args, "nsfw", True)
+    board = thread_info.get("board", "").lower()
 
-    if not allow_nsfw and thread_info.get("board", "").lower() in NSFW_BOARDS:
+    if not args.nsfw and board in NSFW_BOARDS:
         return False
 
-    timestamp = posts[0].get("time")
-    if timestamp:
-        post_date = datetime.utcfromtimestamp(timestamp).date()
+    op = posts[0]
 
-        if args.date and post_date != datetime.strptime(args.date, "%Y/%m/%d").date():
-            return False
-
-        if args.before and post_date >= datetime.strptime(args.before, "%Y/%m/%d").date():
-            return False
-
-        if args.after and post_date <= datetime.strptime(args.after, "%Y/%m/%d").date():
-            return False
-
-    replies = posts[0].get("replies", 0)
-    if args.min_replies and replies < args.min_replies:
-        return False
-    if args.max_replies and replies > args.max_replies:
+    if not check_date(op.get("time"), args):
         return False
 
-    if getattr(args, "op_only", False):
-        posts_to_check = posts[:1]
-    elif getattr(args, "no_op", False):
-        posts_to_check = posts[1:]
-    else:
-        posts_to_check = posts
+    if not check_replies(op.get("replies", 0), args):
+        return False
 
-    if not allow_nsfw:
-        for post in posts_to_check:
-            com = post.get("com")
-            if not com:
-                continue
-            com = com.lower()
+    posts = select_posts(posts, args)
 
-            if post.get("rating", "").lower() == "nsfw":
+    allow_nsfw = args.nsfw
+    keywords = args.key
+
+    for p in posts:
+        com = p.get("com")
+        text = com.casefold() if com else ""
+
+        if not allow_nsfw:
+            if p.get("rating", "").lower() == "nsfw":
                 return False
-
-            if any(w in com for w in NSFW_KEYWORDS):
+            if text and any(w in text for w in NSFW_KEYWORDS):
                 return False
             
-    if args.key:
-        keys_lower = tuple(k.lower() for k in args.key)
+        if keywords and any(k in text for k in keywords):
+            return True
 
-        if not any(
-            any(k in (p.get("com", "").lower()) for k in keys_lower)
-            for p in posts_to_check
-        ):
-            return False
-
-    if args.exclude:
-        ex_re = build_exclude_regex(args.exclude)
-        if ex_re:
-            for p in posts_to_check:
-                com = p.get("com", "")
-                if com and ex_re.search(com.lower()):
-                    return False
+    if keywords:
+        return False
 
     return True

@@ -3,22 +3,20 @@
 
     **Author:** JuaanReis  
     **Date:** 2-12-2025  
-    **Last modification:** -
+    **Last modification:** 25-12-2025
     **E-mail:** teixeiradosreisjuan@gmail.com  
     **Version:** 1.1.5
 
     **Example:**
         ```python
     from src.core.download_img import download_thread_images
-    download_thread_images("o", 1, 28745723, "downloads")
+    download_thread_images("o", 28745723, "downloads")
         ```
 """
 import os
 from src.network.get_all_boards import get_response
-from src.utils.color import colorize
 
-def download_thread_images(board: str, position: int, thread_no: int, output_dir="images"):
-    print(colorize("[+]", "\033[32m"), f"downloading images from the thread", colorize(position, "\033[34m"))
+def download_thread_images(board: str, thread_no: int, output_dir="images"):
     api_url = f"https://a.4cdn.org/{board}/thread/{thread_no}.json"
 
     r = get_response(api_url)

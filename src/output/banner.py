@@ -3,9 +3,9 @@
 
     **Author:** JuaanReis       
     **Date:** 25-09-2025        
-    **Last modification:** 21-11-2025       
+    **Last modification:** 25-12-2025       
     **E-mail:** teixeiradosreisjuan@gmail.com       
-    **Version:** 1.1.6            
+    **Version:** 1.1.5rc2            
 
     **Example:**        
     ```python
@@ -32,8 +32,11 @@ nsfw_boards = [
 
 def banner_logo() -> str:
     if logo:
-        with open("./src/output/banner.txt", "r") as f:
-            return f.read()
+        try:
+            with open("./src/output/banner.txt", "r") as f:
+                return f.read()
+        except FileNotFoundError:
+            return ""
     return ""
 
 def print_line(msg: str, size: int = 10, banner: str = ""):
@@ -49,19 +52,29 @@ def print_line(msg: str, size: int = 10, banner: str = ""):
     print("‾" * ((size * 2) + len(msg) + 2))
 
     for flag, value in args_dict.items():
-        if value is not None:
-            print(f"  {colorize("$", Fore.GREEN)} {flag.ljust(max_len)} : {color_ansi}{value}\033[0m")
+        if value not in (None, "", False):
+            if isinstance(value, list):
+                value_str = ", ".join(str(v) for v in value)
+            else:
+                value_str = str(value)
+            print(f"  {colorize('$', Fore.GREEN)} {flag.ljust(max_len)} : {color_ansi}{value_str}\033[0m")
 
     print()
     print("‾" * ((size * 2) + len(msg) + 2))
 
 def banner_info():
     if output_print:
-        with open("./src/output/version.txt", "r") as f:
-            version = f.read().strip()
+        try:
+            with open("./src/output/version.txt", "r") as f:
+                version = f.read().strip() or "v?.?.?b?-vwvf"
+        except FileNotFoundError:
+            version = "v?.?.?b?-vwvf"
+
+        if version == "v?.?.?b?-vwvf":
+            print(f"{colorize("There's probably something wrong with this version.", "\033[41m")}")
 
         print_line(
-            colorize(f"pepeScraper {version} ", Fore.GREEN),
+            colorize(f"pepeScraper {version}", Fore.GREEN),
             35,
             colorize(banner_logo(), "\033[37m")
         )
@@ -112,7 +125,7 @@ def display_links(links: dict, args: Namespace):
         for line in results:
             print(line)
 
-        print()
+        print("--" * 20 if args.download_image else "")
 
 if __name__ == "__main__":
     banner_info()

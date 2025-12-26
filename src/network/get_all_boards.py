@@ -4,9 +4,9 @@
 
     **Author:** JuaanReis       
     **Date:** 28-08-2025        
-    **Last modification:** 21-11-2025         
+    **Last modification:** 25-12-2025         
     **E-mail:** teixeiradosreisjuan@gmail.com           
-    **Version:** 1.1.5        
+    **Version:**  1.1.5rc2       
 
     **Example:**
         ```python
@@ -19,9 +19,10 @@
         ```
 """
 
-from httpx import Response, HTTPStatusError, ConnectError, RequestError
+from httpx import HTTPStatusError, ConnectError, RequestError
 import orjson as json
 import config
+from src.network.config_net import clients
 from time import sleep, time
 
 def get_response(url: str, retries: int = 3, delay: float = config.delay):
@@ -30,7 +31,7 @@ def get_response(url: str, retries: int = 3, delay: float = config.delay):
 
     for attempt in range(retries):
 
-        c = config.clients[rr % len(config.clients)]
+        c = clients[rr % len(clients)]
         rr += 1
 
         try:

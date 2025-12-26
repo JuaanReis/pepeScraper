@@ -3,9 +3,9 @@
 
     **Author:** JuaanReis           
     **Date:** 25-09-2025            
-    **Last modification:** 21-11-2025             
+    **Last modification:** 25-12-2025             
     **E-mail:** teixeiradosreisjuan@gmail.com           
-    **Version:** 1.1.5            
+    **Version:**  1.1.5rc2           
 
     **Example:**
         ```python
@@ -21,7 +21,6 @@ from tqdm import tqdm
 tqdm._instances.clear()
 
 def get_post() -> list:
-    # Tenta ler as boards
     try:
         with open("./src/data/boards.json", "r") as f:
             data = json.loads(f.read())
@@ -76,11 +75,11 @@ def get_post_thread(selected_boards: list[str] | None = None, workers=20) -> dic
 
         return (b, threads)
 
-    boards_iter = tqdm(boards, desc="Processing boards", bar_format=config.color_ansi + "{l_bar}{bar}{r_bar}" + "\033[0m", ncols=100) if not config.debug else boards
+    boards_iter = tqdm(boards, mininterval=0.1, desc="Processing boards", bar_format=config.color_ansi + "{l_bar}{bar}{r_bar}" + "\033[0m", ncols=100) if not config.debug else boards
 
-    max_workers = min(workers, config.max_threads * config.thread_multiplier)
+    max_workers = min(workers, config.max_threads)
 
-    with ThreadPoolExecutor(max_workers=max_workers) as exe:
+    with ThreadPoolExecutor(max_workers=max_workers * config.thread_multiplier) as exe:
         for b, threads in exe.map(fetch_boards, boards_iter):
             all_threads[b] = threads
 
@@ -89,7 +88,7 @@ def get_post_thread(selected_boards: list[str] | None = None, workers=20) -> dic
 def save_threads(threads: dict):
     with open("./src/data/threads.json", "w") as f:
         json.dump(threads, f, indent=4)
-
+                                                    
 def get_thread_info(board: str, thread_no: int) -> dict | None:
     api_url = f"https://a.4cdn.org/{board}/thread/{thread_no}.json"
     response = get_response(api_url)
@@ -106,4 +105,4 @@ def get_thread_info(board: str, thread_no: int) -> dict | None:
     else:
         if config.debug:
             tqdm.write("[THREAD ERROR] No response")
-        return None
+        return None       

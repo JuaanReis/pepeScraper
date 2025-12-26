@@ -3,9 +3,9 @@
 
     **Author:** JuaanReis       
     **Date:** 25-09-2025        
-    **Last modification:** 21-11-2025          
+    **Last modification:** 25-12-2025          
     **E-mail:** teixeiradosreisjuan@gmail.com       
-    **Version:** 1.1.5            
+    **Version:**  1.1.5rc2           
 
     **Example:**
         ```python
@@ -16,6 +16,7 @@
 from src.core.posts import get_post_thread, get_thread_info
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.core.matcher import thread_matches
+from src.core.cache import get_thread_info_cached
 from argparse import Namespace
 from tqdm import tqdm
 import config
@@ -44,11 +45,14 @@ def search_threads(args: Namespace) -> dict:
     total_tasks = len(tasks)
     if total_tasks == 0:
         return results
+    threads = min(args.threads, config.max_threads)
+    with ThreadPoolExecutor(max_workers=threads * config.thread_multiplier) as executor:
+        futures = {
+            executor.submit(get_thread_info_cached, board, thread_no): (board, thread_no)
+            for board, thread_no in tasks
+        }
 
-    with ThreadPoolExecutor(max_workers = min(args.threads, config.max_threads * config.thread_multiplier)) as executor:
-        futures = {executor.submit(get_thread_info, board, thread_no): (board, thread_no) for board, thread_no in tasks}
-
-        for future in tqdm(as_completed(futures), total=total_tasks, desc="Processing threads", bar_format=config.color_ansi + "{l_bar}{bar}{r_bar}" + "\033[0m", ncols=100):
+        for future in tqdm(as_completed(futures), mininterval=0.001, total=total_tasks, desc="Processing threads"):
             board, thread_no = futures[future]
             try:
                 thread_info = future.result()
@@ -59,9 +63,7 @@ def search_threads(args: Namespace) -> dict:
                 continue
 
             if thread_matches(thread_info, args):
-                if board not in results:
-                    results[board] = []
-                results[board].append(thread_no)
+                results.setdefault(board, []).append(thread_no)
 
     return results
 
@@ -73,7 +75,7 @@ def build_thread_links(results: dict) -> dict:
         for thread_no in thread_list:
             url = f"https://boards.4chan.org/{board}/thread/{thread_no}"
 
-            info = get_thread_info(board, thread_no)
+            info = get_thread_info_cached(board, thread_no)
             if not info or "posts" not in info or not info["posts"]:
                 links[board].append({"url": url, "title": "[No title]", "comment": "[No content]"})
                 continue
@@ -110,7 +112,7 @@ def save_links(links: dict, file: str):
             print(f"[ERROR SAVE RESULT]: {e}")
 
 def save_log(links: dict, args: Namespace):
-    if config.logs:
+    if config.logs or args.log:
         import os
         from datetime import datetime
         try:

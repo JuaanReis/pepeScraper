@@ -1,13 +1,17 @@
 from src.output.banner import banner_info, display_links
+from src.output.boards_helper import print_boards
 from src.core.search_posts import search_threads, build_thread_links, save_log
 from src.core.output import download_output
 from src.flags import parse_args
-from config import color_ansi 
+from src.utils.color import colorize
+from config import auto_cls 
 from time import time
 
 def main():
     start_run = time()
     args = parse_args()
+    if args.all_boards:
+        print_boards()
     banner_info()
     start = time()
     results = search_threads(args)
@@ -18,8 +22,11 @@ def main():
     download_output(args, links, results)
     end_run = time()
     print("--" * 20)
-    print(f"Requests made in {color_ansi}{end - start:.2f}\033[0ms")
-    print(f"Task completed in {color_ansi}{end_run - start_run:.2f}\033[0ms")
-            
+    print(f"Requests made in {colorize(f"{end - start:.2f}s", "\033[33m")}")
+    print(f"Task completed in {colorize(f"{end_run - start_run:.2f}s", "\033[33m")}")
+
 if __name__ == "__main__":
+    if auto_cls:
+        from os import system
+        system('cls')
     main()

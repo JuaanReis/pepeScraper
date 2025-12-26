@@ -43,25 +43,36 @@ If you use Linux it will also be the same thing above (but Linux sometimes force
     pip install -r requirements.txt
 ```
 
+If you want to run just one script to download everything at once, type the following at the command prompt.
+
+```bash
+    git clone https://github.com/JuaanReis/pepeScraper
+    cd ./pepeScraper
+    pip install -r requirements.txt
+    py main.py -h
+```
+
 ## Flags
 
 ```
-    "--key <w>": keywords used as the base for search and scraping  
-    "--thread <n>": 4chan thread where the posts are located  
-    "--exclude, -e <w>": keywords to be excluded from the results  
-    "--date <YYYY/MM/DD>": exact date when the OP post was made  
-    "--before <YYYY/MM/DD>": posts before the given date up to today  
-    "--after <YYYY/MM/DD>": posts after the given date up to today  
-    "--min-replies <n>": minimum number of replies the thread must have  
-    "--max-replies <n>": maximum number of replies the thread can have  
-    "--board <board_name>": name(s) of the board(s) to search  
-    "-T <n>": number of threads that the program will work with (workers in the ThreadPoolExecutor)  
-    "--op-only, -op": only consider the original post (OP)  
-    "--no-op, -nop": It's the same as above but the opposite
-    "--nsfw, -n": to enable vulgar posts
-    "--nsfw-title, -nt": to enable title vulgar posts
+    "--key <w>": keywords used as the base for search and scraping.  
+    "--thread <n>": 4chan thread where the posts are located.
+    "--date <YYYY/MM/DD>": exact date when the OP post was made.  
+    "--before <YYYY/MM/DD>": posts before the given date up to today.  
+    "--after <YYYY/MM/DD>": posts after the given date up to today.  
+    "--min-replies <n>": minimum number of replies the thread must have.  
+    "--max-replies <n>": maximum number of replies the thread can have.  
+    "--board <board_name>": name(s) of the board(s) to search.  
+    "-T <n>": number of threads that the program will work with (workers in the ThreadPoolExecutor).  
+    "--op-only, -op": only consider the original post (OP).
+    "--no-op, -nop": It's the same as above but the opposite.
+    "--nsfw, -n": to enable vulgar posts.
+    "--nsfw-title, -nt": to enable title vulgar posts.
     "--output, -o": to save the results to a text file (on your computer, just the link).
     "--download_image, -di": download all images from the thread.
+    "--log": saves the logs in "pepescraper/src/data/logs"
+    "--all-boards, -ab": Show all boards.
+    "--proxy, -p <w>": connects to proxy.
 ```
 
 ## Example
@@ -85,7 +96,7 @@ Everything is stored in RAM and deleted when the program finishes. (That's right
 > I'm serious, pornography can destroy your brain, your body, and your family (no matter how many times I write this, you'll ignore it).
 '
 ```bash
-    python main.py --keyword "pepe" --exclude "nsfw" --date 01-01-1970
+    python main.py --keyword "pepe" --date 01/01/2025
 ```
 *This can make your research perhaps safer (I don't know if I programmed this right).*
 
