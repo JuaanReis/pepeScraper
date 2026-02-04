@@ -17,7 +17,6 @@
 """
 
 from config import color, color_ansi
-from src.utils.events import next_christmas_color
 
 def colorize(text: str, color_code: str) -> str:
     if not color:  

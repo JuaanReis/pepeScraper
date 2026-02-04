@@ -1,6 +1,7 @@
 from src.output.banner import banner_info, display_links
 from src.output.boards_helper import print_boards
-from src.core.search_posts import search_threads, build_thread_links, save_log
+from src.core.search_posts import search_threads, build_thread_links
+from src.core.save_log import save_log
 from src.core.output import download_output
 from src.flags import parse_args
 from src.utils.color import colorize
@@ -27,6 +28,6 @@ def main():
 
 if __name__ == "__main__":
     if auto_cls:
-        from os import system
-        system('cls')
+        from os import system, name
+        system('cls' if name == 'nt' else 'clear')
     main()

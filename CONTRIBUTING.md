@@ -45,4 +45,3 @@ Each new file must follow the following standards:
 
 ## Language
 If you want to try to integrate the project with another language for performance or connection, feel free.
-

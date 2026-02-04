@@ -21,6 +21,7 @@ import argparse, sys
 from argparse import Namespace
 from datetime import datetime
 from src.output.helper import show_help
+from config import all_boards
 
 def parse_date(d: str):
     if not d:
@@ -36,8 +37,8 @@ def parse_args() -> Namespace | None:
     if "-h" in sys.argv or "--help" in sys.argv:
         show_help()
         sys.exit(0)
-        
-    parser.add_argument("--thread", "-t", type=int)
+
+    parser.add_argument("--thread", "-th", type=str, default="")
     parser.add_argument("--key", "-k", nargs="+")
     parser.add_argument("--date", type=parse_date)
     parser.add_argument("--before", type=parse_date)
@@ -45,19 +46,24 @@ def parse_args() -> Namespace | None:
     parser.add_argument("--min-replies", "-mnr", type=int)
     parser.add_argument("--max-replies", "-mxr", type=int)
     parser.add_argument("--board", "-b", nargs="+")
-    parser.add_argument("--threads", "-T", type=int, default=35)
-    parser.add_argument("--op-only", "-op", action="store_true")
-    parser.add_argument("--no-op", "-nop", action="store_true")
+    parser.add_argument("--threads", "-T", type=int, default=3)
+    parser.add_argument("--op-only", "-op", action="store_true", default=False)
+    parser.add_argument("--no-op", "-nop", action="store_true", default=False)
+    parser.add_argument("--title", "-t", action="store_true", default=False)
     parser.add_argument("--nsfw", "-n", action="store_true", default=False)
-    parser.add_argument("--output", "-o", type=str)
+    parser.add_argument("--output", "-o", type=str, default="")
     parser.add_argument("--nsfw-title", "-nt", action="store_true")
     parser.add_argument("--download_image", "-di", default="")
     parser.add_argument("--proxy", "-p", type=str, default="")
-    parser.add_argument("--log", action="store_true", default=False)
+    parser.add_argument("--log", type=str, default="")
     parser.add_argument("--all-boards", "-ab", action="store_true", default=False)
     args = parser.parse_args()
 
-    if not args.key or not args.board:
+    if not args.key and not args.all_boards:
+        print("[ERROR] It is not possible to perform a search without a search term, the key is empty (--key == '')")
+        sys.exit(0)
+
+    if not all_boards and (not args.key or not args.board):
         if not args.all_boards:
             print("[INPUT ERROR] You must specify the keyword (-k) and the board (-b) specified.")
             sys.exit(0)

@@ -30,66 +30,52 @@ pepeScraper is a scraper that uses context for your searches and returns exactly
 If you use Windows, just go to releases and download the latest version and then install the dependencies. *If you want to help and have access to the source code, use the code below.*
 
 ```bash
-    git clone https://JuaanReis/pepeScraper.git
-    pip install -r requirements.txt
-```
-
-If you use Linux it will also be the same thing above (but Linux sometimes forces you to use that damn venv) so use the code below.
-
-```bash
     git clone https://github.com/JuaanReis/pepeScraper.git
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
-```
-
-If you want to run just one script to download everything at once, type the following at the command prompt.
-
-```bash
-    git clone https://github.com/JuaanReis/pepeScraper
     cd ./pepeScraper
     pip install -r requirements.txt
-    py main.py -h
+    py main.py --help
 ```
 
 ## Flags
 
 ```
-    "--key <w>": keywords used as the base for search and scraping.  
-    "--thread <n>": 4chan thread where the posts are located.
+    "--key <w>": keywords used as the base for search and scraping. 
     "--date <YYYY/MM/DD>": exact date when the OP post was made.  
     "--before <YYYY/MM/DD>": posts before the given date up to today.  
     "--after <YYYY/MM/DD>": posts after the given date up to today.  
     "--min-replies <n>": minimum number of replies the thread must have.  
     "--max-replies <n>": maximum number of replies the thread can have.  
     "--board <board_name>": name(s) of the board(s) to search.  
-    "-T <n>": number of threads that the program will work with (workers in the ThreadPoolExecutor).  
+    "-T <n>": number of threads that the program will work with (This will change the speed, not the outcome.).  
     "--op-only, -op": only consider the original post (OP).
     "--no-op, -nop": It's the same as above but the opposite.
     "--nsfw, -n": to enable vulgar posts.
     "--nsfw-title, -nt": to enable title vulgar posts.
     "--output, -o": to save the results to a text file (on your computer, just the link).
     "--download_image, -di": download all images from the thread.
-    "--log": saves the logs in "pepescraper/src/data/logs"
+    "--log <w>": saves the logs in "pepescraper/src/data/logs"
     "--all-boards, -ab": Show all boards.
     "--proxy, -p <w>": connects to proxy.
+    "--title, -t": Apply the search term to the title.
 ```
 
 ## Example
 
-<img src="./assets/1-1-4-rc-1.png" style="background-align: center">
+<img src="./assets/1-1-6.png" style="background-align: center">
 
-> I know this meme is awful and the screenshot turned out terrible.
+> I don't even know what this meme means (and fuck you if you do).
 
 ## Privacy and Data Storage
 
-PepeScraper does NOT store anything <br>
+PepeScraper does NOT automatically store anything. <br>
 it only uses the API and creates a direct link to 4chan. <br>
-No logs, no history, no databases, no Facebook copy (maybe you understand).
+No logs, no history, no databases, no Facebook copy (maybe you understand). <br>
+You have the option to save images of the boards, logs, and output results, but nothing is automatic 
+(*unless you choose this option in the configuration file*)
 
-Everything is stored in RAM and deleted when the program finishes. (That's right, your mom won't find out what you searched for.)
+*Everything is stored in RAM and deleted when the program finishes. (That's right, your mom won't find out what you searched for.)*
 
-> Please don't sue me, I don't have the money to pay a lawyer.
+> Please don't sue me, I don't have the money to pay a lawyer. *(Sometimes there isn't even enough money to buy food.)*
 
 ## Careful with NSFW Content
 
@@ -102,4 +88,5 @@ Everything is stored in RAM and deleted when the program finishes. (That's right
 
 ---
 <br>
-<a href="https://youtu.be/HWjCStB6k4o?si=C6TMFRuCYLvrzyJH" style="color:white; text-decoration: None; cursor: text">The end?</a>
+<samp>"Sometimes, longing for the past is due to a lack of money (or friends).<br>
+Do something different from me, leave the house and go live."</samp>

@@ -11,7 +11,7 @@
     **Example:**
         ```python
     from get_all_boards import get_boards_api
-
+  
     boards = get_boards_api()
 
     for board in boards:
@@ -23,7 +23,7 @@ from httpx import HTTPStatusError, ConnectError, RequestError
 import orjson as json
 import config
 from src.network.config_net import clients
-from time import sleep, time
+from time import sleep
 
 def get_response(url: str, retries: int = 3, delay: float = config.delay):
 
@@ -60,10 +60,9 @@ def get_response(url: str, retries: int = 3, delay: float = config.delay):
     return None
 
 def get_boards_api() -> dict:
-    start = time()
     boards = get_response("https://a.4cdn.org/boards.json")
     if not boards:
-        print("ERROR: could not access the api.")
+        print("[ERROR] could not access the api.")
         if config.debug and boards is not None:
             print(f"[API STATUS] {boards.status_code}")
         return
@@ -75,8 +74,6 @@ def get_boards_api() -> dict:
 
     with open("./src/data/boards.json", "wb") as f:
         f.write(data)
-
-    end = time()
 
     return boards.json()
 

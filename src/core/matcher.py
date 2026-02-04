@@ -24,6 +24,11 @@ import json
 with open("./src/core/no_nsfw.json", "r") as f:
     NSFW_KEYWORDS = tuple(k.lower() for k in json.load(f))
 
+NSFW_REGEX = re.compile(
+    r"(?<!\w)(" + "|".join(map(re.escape, NSFW_KEYWORDS)) + r")(?!\w)",
+    re.IGNORECASE
+)
+
 NSFW_BOARDS = {"a","h","e","u","d","s","hc","hm","y","t","gif","r","hr","wg"}
 
 def check_date(timestamp, args):
@@ -40,6 +45,17 @@ def check_date(timestamp, args):
         return False
 
     return True
+
+def title_matches(op, keywords):
+    if not keywords:
+        return True
+
+    title = (op.get("sub") or "")
+    if not title:
+        return False
+
+    pattern = r"(?<!\w)(" + "|".join(map(re.escape, keywords)) + r")(?!\w)"
+    return re.search(pattern, title, re.IGNORECASE) is not None
 
 def check_replies(replies, args):
     if args.min_replies and replies < args.min_replies:
@@ -60,12 +76,12 @@ def check_nsfw(posts, allow_nsfw):
         return True
 
     for p in posts:
-        com = (p.get("com") or "").lower()
+        text = (p.get("com") or "").casefold()
 
         if p.get("rating", "").lower() == "nsfw":
             return False
 
-        if any(w in com for w in NSFW_KEYWORDS):
+        if text and NSFW_REGEX.search(text):
             return False
 
     return True
@@ -90,6 +106,9 @@ def contains_excluded(posts, ex_re):
     return False
 
 def thread_matches(thread_info, args):
+    allow_nsfw = args.nsfw
+    keywords = args.key
+
     if not thread_info:
         return False
 
@@ -104,6 +123,9 @@ def thread_matches(thread_info, args):
 
     op = posts[0]
 
+    if args.title and not title_matches(op, keywords):
+        return False
+
     if not check_date(op.get("time"), args):
         return False
 
@@ -111,9 +133,6 @@ def thread_matches(thread_info, args):
         return False
 
     posts = select_posts(posts, args)
-
-    allow_nsfw = args.nsfw
-    keywords = args.key
 
     for p in posts:
         com = p.get("com")

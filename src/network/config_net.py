@@ -11,7 +11,6 @@ client_kwargs = {
         max_connections=70
     ),
     "headers": {
-        "Connection": "keep-alive",
         "Accept-Encoding": "br, gzip"
     }
 }

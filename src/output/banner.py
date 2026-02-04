@@ -32,16 +32,35 @@ nsfw_boards = [
 
 def banner_logo() -> str:
     if logo:
+        s_logo = colorize("The logo took a day off (or maybe it's just not coming back).", "\033[41m")
         try:
             with open("./src/output/banner.txt", "r") as f:
-                return f.read()
+                return f.read() or s_logo
         except FileNotFoundError:
-            return ""
+            return s_logo
     return ""
 
 def print_line(msg: str, size: int = 10, banner: str = ""):
+    total_width = (size * 2) + len(msg) + 2
+
     print("_" * size, msg, "_" * size)
-    print(banner)
+
+    if banner:
+        lines = banner.splitlines()
+
+        non_empty = [l for l in lines if l.strip()]
+
+        min_indent = min(len(l) - len(l.lstrip()) for l in non_empty)
+
+        normalized = [l[min_indent:] for l in lines]
+
+        max_banner_width = max(len(l) for l in normalized)
+
+        block_pad = max(0, (total_width - max_banner_width) // 2)
+
+        for line in normalized:
+            print(" " * block_pad + line)
+
     print()
 
     args = parse_args()
@@ -49,7 +68,7 @@ def print_line(msg: str, size: int = 10, banner: str = ""):
 
     max_len = max(len(flag) for flag in args_dict.keys())
 
-    print("‾" * ((size * 2) + len(msg) + 2))
+    print("‾" * total_width)
 
     for flag, value in args_dict.items():
         if value not in (None, "", False):
@@ -57,24 +76,29 @@ def print_line(msg: str, size: int = 10, banner: str = ""):
                 value_str = ", ".join(str(v) for v in value)
             else:
                 value_str = str(value)
-            print(f"  {colorize('$', Fore.GREEN)} {flag.ljust(max_len)} : {color_ansi}{value_str}\033[0m")
+
+            print(
+                f"  {colorize('$', Fore.GREEN)} "
+                f"{flag.ljust(max_len)} : {color_ansi}{value_str}\033[0m"
+            )
 
     print()
-    print("‾" * ((size * 2) + len(msg) + 2))
+    print("‾" * total_width)
+
 
 def banner_info():
     if output_print:
         try:
             with open("./src/output/version.txt", "r") as f:
-                version = f.read().strip() or "v?.?.?b?-vwvf"
+                version = f.read().strip() or "?.?.?b?-vwvf"
         except FileNotFoundError:
-            version = "v?.?.?b?-vwvf"
+            version = "?.?.?b?-vwvf"
 
-        if version == "v?.?.?b?-vwvf":
+        if version == "?.?.?b?-vwvf":
             print(f"{colorize("There's probably something wrong with this version.", "\033[41m")}")
 
         print_line(
-            colorize(f"pepeScraper {version}", Fore.GREEN),
+            colorize(f"pepeScraper v{version}", Fore.GREEN),
             35,
             colorize(banner_logo(), "\033[37m")
         )
@@ -88,7 +112,7 @@ def process_thread(board, thread, args) -> str:
         title = thread.get("title", "Title not found")
 
     return (
-        f"{colorize('[+]', Fore.GREEN)} "
+        f"{Fore.GREEN}{'[+] '}{Fore.RESET}"
         f"{colorize(url, Fore.YELLOW)} → "
         f"{colorize(title, Fore.MAGENTA if not board in nsfw_boards else Fore.RED)}"
     )
@@ -102,7 +126,7 @@ def display_links(links: dict, args: Namespace):
         if output_print:
             print(
                 f"{colorize(f'[Board {board}]', Fore.CYAN)} → "
-                f"{colorize(str(len(thread_links)), Fore.YELLOW)} results"
+                f"[{colorize(str(len(thread_links)), Fore.YELLOW)} results]"
             )
             print("-" * (8 + len(board)))
 

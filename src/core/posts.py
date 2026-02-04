@@ -25,7 +25,6 @@ def get_post() -> list:
         with open("./src/data/boards.json", "r") as f:
             data = json.loads(f.read())
         return [board["board"] for board in data["boards"]]
-
     except (FileNotFoundError, json.JSONDecodeError):
         boards = get_boards_api()  
 
@@ -40,7 +39,7 @@ def get_post() -> list:
         except Exception as e:
             raise RuntimeError(f"Boards.json still invalid after recreation: {e}")
 
-def get_post_thread(selected_boards: list[str] | None = None, workers=20) -> dict:
+def get_post_thread(selected_boards: list[str] | None = None, workers=20,) -> dict:
     boards = get_post()
 
     if selected_boards:

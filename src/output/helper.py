@@ -35,10 +35,16 @@ FILTERS:
 
     -mxr, --max-replies <n>
         Only match threads with at most N replies.
+          
+    -t, --title
+          Filter the search by keyword in the title.
 
 THREAD BEHAVIOR:
+    -th, threads <n>
+        Scrape in a single thread
+
     -T, --threads <n>
-        Number of worker threads. Default = 35.
+        Number of worker threads. Default = 3.
 
     -op, --op-only
         Only match the OP post (ignore replies).
@@ -64,9 +70,6 @@ OUTPUT:
         Activate the log that is saved in "./src/data/logs"
 
 MISC:
-    -t, --thread <id>
-        Scan only a single thread ID.
-
     -h, --help
         Show this help message.
           
@@ -75,7 +78,7 @@ MISC:
 
 EXAMPLES:
     py main.py -k car -b o
-    py main.py -k supra skyline -b o fit -T 80
+    py main.py -k supra skyline -b o fit -T 7
     py main.py -k cat -b a -after 2024/01/01 -mnr 10
 ____________________________________________________________________________________
 """)
