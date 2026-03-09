@@ -1,3 +1,4 @@
+from src.utils.language import translate
 from src.output.banner import banner_info, display_links
 from src.output.boards_helper import print_boards
 from src.core.search_posts import search_threads, build_thread_links
@@ -23,8 +24,8 @@ def main():
     download_output(args, links, results)
     end_run = time()
     print("--" * 20)
-    print(f"Requests made in {colorize(f"{end - start:.2f}s", "\033[33m")}")
-    print(f"Task completed in {colorize(f"{end_run - start_run:.2f}s", "\033[33m")}")
+    print(f"{translate("Requests made in", args.language)} {colorize(f"{end - start:.2f}s", "\033[33m")}")
+    print(f"{translate("Task completed in", args.language)} {colorize(f"{end_run - start_run:.2f}s", "\033[33m")}")
 
 if __name__ == "__main__":
     if auto_cls:

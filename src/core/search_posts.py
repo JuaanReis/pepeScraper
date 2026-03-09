@@ -13,6 +13,7 @@
     result = search_threads(args)
         ```
 """
+from src.utils.language import translate
 from src.core.posts import get_post_thread
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.core.matcher import thread_matches
@@ -52,7 +53,7 @@ def search_threads(args: Namespace) -> dict:
             for board, thread_no in tasks
         }
 
-        for future in tqdm(as_completed(futures), mininterval=0.01, total=total_tasks, desc="Processing threads"):
+        for future in tqdm(as_completed(futures), mininterval=config.update_bar, total=total_tasks, desc=translate("Processing threads", args.language)):
             board, thread_no = futures[future]
             try:
                 thread_info = future.result()

@@ -22,8 +22,10 @@ from os import cpu_count
 from src.flags import parse_args
 from src.utils.color import colorize
 from config import logo, output_print, color_ansi
+from src.utils.language import translate
 
 init(autoreset=True)
+args = parse_args()
 
 nsfw_boards = [
     "h", "e", "u", "d", "s", "hc", "hm", "y", "t",
@@ -32,7 +34,7 @@ nsfw_boards = [
 
 def banner_logo() -> str:
     if logo:
-        s_logo = colorize("The logo took a day off (or maybe it's just not coming back).", "\033[41m")
+        s_logo = "\n" + colorize("The logo took a day off (or maybe it's just not coming back).", "\033[41m")
         try:
             with open("./src/output/banner.txt", "r") as f:
                 return f.read() or s_logo
@@ -63,12 +65,11 @@ def print_line(msg: str, size: int = 10, banner: str = ""):
 
     print()
 
-    args = parse_args()
     args_dict = vars(args)
 
     max_len = max(len(flag) for flag in args_dict.keys())
 
-    print("‾" * total_width)
+    print("‾" * (total_width - 9))
 
     for flag, value in args_dict.items():
         if value not in (None, "", False):
@@ -79,12 +80,11 @@ def print_line(msg: str, size: int = 10, banner: str = ""):
 
             print(
                 f"  {colorize('$', Fore.GREEN)} "
-                f"{flag.ljust(max_len)} : {color_ansi}{value_str}\033[0m"
+                f"{translate(flag.ljust(max_len), args.language)} : {color_ansi}{value_str}\033[0m"
             )
 
     print()
-    print("‾" * total_width)
-
+    print("‾" * (total_width - 9))
 
 def banner_info():
     if output_print:
@@ -107,14 +107,30 @@ def process_thread(board, thread, args) -> str:
     url = thread.get("url", "unknown")
 
     if board in nsfw_boards and not args.nsfw_title:
-        title = colorize("[Title blocked on NSFW boards]", Fore.RED)
+        title = translate("[Title blocked on NSFW boards]", args.language)
+        color = Fore.RED
+
     else:
-        title = thread.get("title", "Title not found")
+        title = thread.get("title")
+
+        if not title:
+            comment = thread.get("com", "")
+
+            if comment:
+                title = comment[:60] + "..."
+            else:
+                title = translate("[No title]", args.language)
+
+        color = (
+            Fore.LIGHTBLACK_EX if title == "[No title]"
+            else Fore.RED if board in nsfw_boards
+            else Fore.MAGENTA
+        )
 
     return (
-        f"{Fore.GREEN}{'[+] '}{Fore.RESET}"
+        f"{colorize('[+] ', Fore.GREEN)}"
         f"{colorize(url, Fore.YELLOW)} → "
-        f"{colorize(title, Fore.MAGENTA if not board in nsfw_boards else Fore.RED)}"
+        f"{colorize(translate(title, args.language), color)}"
     )
 
 def display_links(links: dict, args: Namespace):
@@ -122,18 +138,18 @@ def display_links(links: dict, args: Namespace):
 
     for board, thread_links in links.items():
         print()
+        
+        if thread_links == 0:
+            print(colorize(translate("[-] Links not found", args.language), Fore.RED))
+            print()
+            continue
 
         if output_print:
             print(
-                f"{colorize(f'[Board {board}]', Fore.CYAN)} → "
-                f"[{colorize(str(len(thread_links)), Fore.YELLOW)} results]"
+                f"{colorize(f'[{translate("Board", args.language)} {board}]', Fore.CYAN)} → "
+                f"[{colorize(len(thread_links), Fore.YELLOW)} {translate("results", args.language)}]"
             )
-            print("-" * (8 + len(board)))
-
-        if not thread_links:
-            print(colorize("[-] Link not found", Fore.RED))
-            print()
-            continue
+            print("-" * (9 + len(board)))
 
         results = []
 

@@ -38,26 +38,28 @@ If you use Windows, just go to releases and download the latest version and then
 
 ## Flags
 
-```
-    "--key <w>": keywords used as the base for search and scraping. 
-    "--date <YYYY/MM/DD>": exact date when the OP post was made.  
-    "--before <YYYY/MM/DD>": posts before the given date up to today.  
-    "--after <YYYY/MM/DD>": posts after the given date up to today.  
-    "--min-replies <n>": minimum number of replies the thread must have.  
-    "--max-replies <n>": maximum number of replies the thread can have.  
-    "--board <board_name>": name(s) of the board(s) to search.  
-    "-T <n>": number of threads that the program will work with (This will change the speed, not the outcome.).  
-    "--op-only, -op": only consider the original post (OP).
-    "--no-op, -nop": It's the same as above but the opposite.
-    "--nsfw, -n": to enable vulgar posts.
-    "--nsfw-title, -nt": to enable title vulgar posts.
-    "--output, -o": to save the results to a text file (on your computer, just the link).
-    "--download_image, -di": download all images from the thread.
-    "--log <w>": saves the logs in "pepescraper/src/data/logs"
-    "--all-boards, -ab": Show all boards.
-    "--proxy, -p <w>": connects to proxy.
-    "--title, -t": Apply the search term to the title.
-```
+| Flag | Description | Example |
+|-----|-----|-----|
+| `--key <w>` | Keywords used as the base for search and scraping. | `--key mustang` |
+| `--date <YYYY/MM/DD>` | Exact date when the OP post was made. | `--date 2024/01/10` |
+| `--before <YYYY/MM/DD>` | Posts before the given date up to today. | `--before 2023/05/01` |
+| `--after <YYYY/MM/DD>` | Posts after the given date up to today. | `--after 2024/02/01` |
+| `--min-replies <n>` | Minimum number of replies the thread must have. | `--min-replies 10` |
+| `--max-replies <n>` | Maximum number of replies the thread can have. | `--max-replies 200` |
+| `--board <board_name>` | Name(s) of the board(s) to search. | `--board g` |
+| `-T <n>` | Number of threads that the program will work with (changes speed, not the outcome). | `-T 9` |
+| `--op-only`, `-op` | Only consider the original post (OP). | `-op` |
+| `--no-op`, `-nop` | Opposite of `--op-only`, ignores the OP. | `-nop` |
+| `--nsfw`, `-n` | Enable vulgar posts. | `-n` |
+| `--nsfw-title`, `-nt` | Enable vulgar titles. | `-nt` |
+| `--output`, `-o` | Save the results to a text file (links only). | `-o results.txt` |
+| `--download_image`, `-di` | Download all images from the thread. | `-di` |
+| `--log <w>` | Save logs in `pepescraper/src/data/logs`. | `--log scan.log` |
+| `--all-boards`, `-ab` | Show all boards. | `-ab` |
+| `--proxy`, `-p <w>` | Connect through a proxy. | `-p http://127.0.0.1:8080` |
+| `--title`, `-t` | Apply the search term to the title. | `-t` |
+| `--image`, `-i` | Filter the search by keyword in the image. | `-i` |
+| `--language`, `-l` | Translate the output into the chosen language. | `-l pt` |
 
 ## Example
 

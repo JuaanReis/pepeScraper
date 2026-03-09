@@ -37,8 +37,11 @@ FILTERS:
         Only match threads with at most N replies.
           
     -t, --title
-          Filter the search by keyword in the title.
+        Filter the search by keyword in the title.
 
+    -i, --image
+        Filter the search by keyword in the image.
+          
 THREAD BEHAVIOR:
     -th, threads <n>
         Scrape in a single thread
@@ -70,6 +73,9 @@ OUTPUT:
         Activate the log that is saved in "./src/data/logs"
 
 MISC:
+    -l, --language <lang>
+        translate the output      
+
     -h, --help
         Show this help message.
           

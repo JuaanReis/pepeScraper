@@ -46,6 +46,24 @@ def check_date(timestamp, args):
 
     return True
 
+def image_name_matches(posts, keywords):
+    if not keywords:
+        return True
+
+    for p in posts:
+        filename = (p.get("filename") or "").lower()
+        ext = (p.get("ext") or "").lower()
+
+        if not filename:
+            continue  
+
+        full_name = filename + ext
+
+        if any(k.lower() in full_name for k in keywords):
+            return True
+
+    return False
+
 def title_matches(op, keywords):
     if not keywords:
         return True
@@ -86,14 +104,23 @@ def check_nsfw(posts, allow_nsfw):
 
     return True
 
+def keyword_regex(keywords):
+    return re.compile(
+        r"(?<!\w)(" + "|".join(map(re.escape, keywords)) + r")(?!\w)",
+        re.IGNORECASE
+    )
+
 def contains_keywords(posts, keys):
     if not keys:
         return True
 
+    rgx = keyword_regex(keys)
+
     for p in posts:
-        text = (p.get("com") or "").lower()
-        if any(k in text for k in keys):
+        text = (p.get("com") or "")
+        if rgx.search(text):
             return True
+
     return False
 
 def contains_excluded(posts, ex_re):
@@ -125,6 +152,9 @@ def thread_matches(thread_info, args):
 
     if args.title and not title_matches(op, keywords):
         return False
+    
+    if args.image and not image_name_matches(posts, keywords):
+        return False
 
     if not check_date(op.get("time"), args):
         return False
@@ -143,9 +173,11 @@ def thread_matches(thread_info, args):
                 return False
             if text and any(w in text for w in NSFW_KEYWORDS):
                 return False
-            
-        if keywords and any(k in text for k in keywords):
-            return True
+
+        if keywords:
+            rgx = keyword_regex(keywords)
+            if rgx.search(text):
+                return True
 
     if keywords:
         return False

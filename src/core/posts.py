@@ -14,11 +14,14 @@
         ```
 """
 import orjson as json
+from src.utils.language import translate
 from src.network.get_all_boards import get_response, get_boards_api
 from concurrent.futures import ThreadPoolExecutor
 import config
+from src.flags import parse_args
 from tqdm import tqdm
 tqdm._instances.clear()
+args = parse_args()
 
 def get_post() -> list:
     try:
@@ -74,7 +77,7 @@ def get_post_thread(selected_boards: list[str] | None = None, workers=20,) -> di
 
         return (b, threads)
 
-    boards_iter = tqdm(boards, mininterval=0.1, desc="Processing boards", bar_format=config.color_ansi + "{l_bar}{bar}{r_bar}" + "\033[0m", ncols=100) if not config.debug else boards
+    boards_iter = tqdm(boards, mininterval=0.1, desc=translate("Processing boards", args.language), bar_format=config.color_ansi + "{l_bar}{bar}{r_bar}" + "\033[0m", ncols=100) if not config.debug else boards
 
     max_workers = min(workers, config.max_threads)
 
