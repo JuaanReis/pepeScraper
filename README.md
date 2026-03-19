@@ -87,8 +87,3 @@ You have the option to save images of the boards, logs, and output results, but 
     python main.py --keyword "pepe" --date 01/01/2025
 ```
 *This can make your research perhaps safer (I don't know if I programmed this right).*
-
----
-<br>
-<samp>"Sometimes, longing for the past is due to a lack of money (or friends).<br>
-Do something different from me, leave the house and go live."</samp>
