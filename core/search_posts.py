@@ -64,30 +64,37 @@ def search_threads(args: Namespace) -> dict:
     return results
 
 def build_thread_links(results: dict) -> dict:
-    links = {}
+    links = {board: [] for board in results}
 
-    for board, thread_list in results.items():
-        links[board] = []
-        for thread_no in thread_list:
-            url = f"https://boards.4chan.org/{board}/thread/{thread_no}"
+    tasks = [
+        (board, thread_no)
+        for board, thread_list in results.items()
+        for thread_no in thread_list
+    ]
 
-            info = get_thread_info_cached(board, thread_no)
-            if not info or "posts" not in info or not info["posts"]:
-                links[board].append({"url": url, "title": "[No title]", "comment": "[No content]"})
+    def fetch(board, thread_no):
+        url = f"https://boards.4chan.org/{board}/thread/{thread_no}"
+        info = get_thread_info_cached(board, thread_no)
+
+        if not info or "posts" not in info or not info["posts"]:
+            return board, {"url": url, "title": "[No title]", "comment": "[No content]"}
+
+        first_post = info["posts"][0]
+        title = first_post.get("sub", "[No title]")
+        comment = first_post.get("com", "").replace("<br>", "\n").replace("<wbr>", "").strip()
+        if len(comment) > 150:
+            comment = comment[:150] + "..."
+
+        return board, {"url": url, "title": title, "comment": comment}
+
+    with ThreadPoolExecutor(max_workers=config.max_threads) as executor:
+        futures = {executor.submit(fetch, board, thread_no): (board, thread_no) for board, thread_no in tasks}
+        for future in as_completed(futures):
+            try:
+                board, entry = future.result()
+                links[board].append(entry)
+            except Exception:
                 continue
-
-            first_post = info["posts"][0]
-            title = first_post.get("sub", "[No title]")
-            comment = first_post.get("com", "").replace("<br>", "\n").replace("<wbr>", "").strip()
-
-            if len(comment) > 150:
-                comment = comment[:150] + "..."
-
-            links[board].append({
-                "url": url,
-                "title": title,
-                "comment": comment
-            })
 
     return links
 

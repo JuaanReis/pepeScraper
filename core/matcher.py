@@ -64,16 +64,9 @@ def image_name_matches(posts, keywords):
 
     return False
 
-def title_matches(op, keywords):
-    if not keywords:
-        return True
-
-    title = (op.get("sub") or "")
-    if not title:
-        return False
-
-    pattern = r"(?<!\w)(" + "|".join(map(re.escape, keywords)) + r")(?!\w)"
-    return re.search(pattern, title, re.IGNORECASE) is not None
+def title_matches(op, rgx):
+    title = op.get("sub") or ""
+    return bool(rgx and rgx.search(title))
 
 def check_replies(replies, args):
     if args.min_replies and replies < args.min_replies:
@@ -133,9 +126,6 @@ def contains_excluded(posts, ex_re):
     return False
 
 def thread_matches(thread_info, args):
-    allow_nsfw = args.nsfw
-    keywords = args.key
-
     if not thread_info:
         return False
 
@@ -144,17 +134,10 @@ def thread_matches(thread_info, args):
         return False
 
     board = thread_info.get("board", "").lower()
-
     if not args.nsfw and board in NSFW_BOARDS:
         return False
 
     op = posts[0]
-
-    if args.title and not title_matches(op, keywords):
-        return False
-    
-    if args.image and not image_name_matches(posts, keywords):
-        return False
 
     if not check_date(op.get("time"), args):
         return False
@@ -162,24 +145,33 @@ def thread_matches(thread_info, args):
     if not check_replies(op.get("replies", 0), args):
         return False
 
+    keywords = args.key
+    allow_nsfw = args.nsfw
+
+    rgx = keyword_regex(keywords) if keywords else None
+
+    if args.title:
+        title = op.get("sub") or ""
+        if not rgx or not rgx.search(title):
+            return False
+
+    if args.image:
+        if not image_name_matches(posts, keywords):
+            return False
+
     posts = select_posts(posts, args)
 
     for p in posts:
-        com = p.get("com")
-        text = com.casefold() if com else ""
+        com = p.get("com") or ""
+        text = com.casefold()
 
         if not allow_nsfw:
             if p.get("rating", "").lower() == "nsfw":
                 return False
-            if text and any(w in text for w in NSFW_KEYWORDS):
+            if text and NSFW_REGEX.search(text):
                 return False
 
-        if keywords:
-            rgx = keyword_regex(keywords)
-            if rgx.search(text):
-                return True
+        if rgx and rgx.search(com):
+            return True
 
-    if keywords:
-        return False
-
-    return True
+    return False if keywords else True
