@@ -9,15 +9,14 @@
 
     **Example:**
         ```python
-    from src.core.search_post import search_threads
+    from core.search_post import search_threads
     result = search_threads(args)
         ```
 """
-from src.utils.language import translate
-from src.core.posts import get_post_thread
+from core.posts import get_post_thread
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from src.core.matcher import thread_matches
-from src.core.cache import get_thread_info_cached
+from core.matcher import thread_matches
+from core.cache import get_thread_info_cached
 from argparse import Namespace
 from tqdm import tqdm
 import config
@@ -34,26 +33,20 @@ def search_threads(args: Namespace) -> dict:
         boards = threads_data
 
     for board, thread_list in boards.items():
-        if args.thread:
-            if args.thread in thread_list:
-                tasks.append((board, args.thread))
-            else:
-                continue
-        else:
-            for thread_no in thread_list:
-                tasks.append((board, thread_no))
+        for thread_no in thread_list:
+            tasks.append((board, thread_no))
 
     total_tasks = len(tasks)
     if total_tasks == 0:
         return results
     threads = min(args.threads, config.max_threads)
-    with ThreadPoolExecutor(max_workers=threads * config.thread_multiplier) as executor:
+    with ThreadPoolExecutor(max_workers=threads * max(1, config.thread_multiplier)) as executor:
         futures = {
             executor.submit(get_thread_info_cached, board, thread_no): (board, thread_no)
             for board, thread_no in tasks
         }
 
-        for future in tqdm(as_completed(futures), mininterval=config.update_bar, total=total_tasks, desc=translate("Processing threads", args.language)):
+        for future in tqdm(as_completed(futures), mininterval=config.update_bar, total=total_tasks, desc="Processing threads"):
             board, thread_no = futures[future]
             try:
                 thread_info = future.result()

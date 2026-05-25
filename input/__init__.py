@@ -20,7 +20,7 @@
 import argparse, sys
 from argparse import Namespace
 from datetime import datetime
-from src.output.helper import show_help
+from output.helper import show_help
 from config import all_boards
 
 def parse_date(d: str):
@@ -38,7 +38,6 @@ def parse_args() -> Namespace | None:
         show_help()
         sys.exit(0)
 
-    parser.add_argument("--thread", "-th", type=str, default="")
     parser.add_argument("--key", "-k", nargs="+")
     parser.add_argument("--date", type=parse_date)
     parser.add_argument("--before", type=parse_date)
@@ -53,7 +52,6 @@ def parse_args() -> Namespace | None:
     parser.add_argument("--image", "-i", action="store_true", default=False)
     parser.add_argument("--nsfw", "-n", action="store_true", default=False)
     parser.add_argument("--output", "-o", type=str, default="")
-    parser.add_argument("--language", "-l", type=str, default="")
     parser.add_argument("--nsfw-title", "-nt", action="store_true", default=False)
     parser.add_argument("--download_image", "-di", default="")
     parser.add_argument("--proxy", "-p", type=str, default="")

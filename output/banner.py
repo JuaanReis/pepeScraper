@@ -19,10 +19,9 @@ from argparse import Namespace
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from colorama import Fore, init
 from os import cpu_count
-from src.flags import parse_args
-from src.utils.color import colorize
+from input import parse_args
+from output.color import colorize
 from config import logo, output_print, color_ansi
-from src.utils.language import translate
 
 init(autoreset=True)
 args = parse_args()
@@ -36,7 +35,7 @@ def banner_logo() -> str:
     if logo:
         s_logo = "\n" + colorize("The logo took a day off (or maybe it's just not coming back).", "\033[41m")
         try:
-            with open("./src/output/banner.txt", "r") as f:
+            with open("./pepescraper/banner.txt", "r") as f:
                 return f.read() or s_logo
         except FileNotFoundError:
             return s_logo
@@ -80,7 +79,7 @@ def print_line(msg: str, size: int = 10, banner: str = ""):
 
             print(
                 f"  {colorize('$', Fore.GREEN)} "
-                f"{translate(flag.ljust(max_len), args.language)} : {color_ansi}{value_str}\033[0m"
+                f"{flag.ljust(max_len)} : {color_ansi}{value_str}\033[0m"
             )
 
     print()
@@ -89,7 +88,7 @@ def print_line(msg: str, size: int = 10, banner: str = ""):
 def banner_info():
     if output_print:
         try:
-            with open("./src/output/version.txt", "r") as f:
+            with open("./pepescraper/version.txt", "r") as f:
                 version = f.read().strip() or "?.?.?b?-vwvf"
         except FileNotFoundError:
             version = "?.?.?b?-vwvf"
@@ -107,7 +106,7 @@ def process_thread(board, thread, args) -> str:
     url = thread.get("url", "unknown")
 
     if board in nsfw_boards and not args.nsfw_title:
-        title = translate("[Title blocked on NSFW boards]", args.language)
+        title = "[Title blocked on NSFW boards]"
         color = Fore.RED
 
     else:
@@ -119,7 +118,7 @@ def process_thread(board, thread, args) -> str:
             if comment:
                 title = comment[:60] + "..."
             else:
-                title = translate("[No title]", args.language)
+                title = "[No title]"
 
         color = (
             Fore.LIGHTBLACK_EX if title == "[No title]"
@@ -130,24 +129,25 @@ def process_thread(board, thread, args) -> str:
     return (
         f"{colorize('[+] ', Fore.GREEN)}"
         f"{colorize(url, Fore.YELLOW)} → "
-        f"{colorize(translate(title, args.language), color)}"
+        f"{colorize(title, color)}"
     )
 
 def display_links(links: dict, args: Namespace):
     max_threads = min(args.threads, cpu_count() * 5)
 
+    if not links:
+        print()
+        print("--" * 20)
+        print(colorize("\n  $ ", Fore.RED), "Links not found\n")
+        return
+
     for board, thread_links in links.items():
         print()
-        
-        if thread_links == 0:
-            print(colorize(translate("[-] Links not found", args.language), Fore.RED))
-            print()
-            continue
 
         if output_print:
             print(
-                f"{colorize(f'[{translate("Board", args.language)} {board}]', Fore.CYAN)} → "
-                f"[{colorize(len(thread_links), Fore.YELLOW)} {translate("results", args.language)}]"
+                f"{colorize(f'[Board {board}]', Fore.CYAN)} → "
+                f"[{colorize(len(thread_links), Fore.YELLOW)} results]"
             )
             print("-" * (9 + len(board)))
 
@@ -165,7 +165,7 @@ def display_links(links: dict, args: Namespace):
         for line in results:
             print(line)
 
-        print("--" * 20 if args.download_image else "")
+    print("--" * 20 if args.download_image else "")
 
 if __name__ == "__main__":
     banner_info()

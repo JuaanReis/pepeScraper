@@ -9,7 +9,7 @@
 
     **Example:**    
     ```python
-        from src.utils.ip_creator import get_ip
+        from utils.ip_creator import get_ip
         
         print(get_ip())
     ```

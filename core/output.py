@@ -9,15 +9,15 @@
 
     **Example:**
         ```python
-    from src.core.output import download_output
+    from core.output import download_output
 
     download_output(args, links, results)
         ```
 """
 
 from argparse import Namespace
-from src.core.download_img import download_thread_images
-from src.core.search_posts import save_links
+from core.download_img import download_thread_images
+from core.search_posts import save_links
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
 import config

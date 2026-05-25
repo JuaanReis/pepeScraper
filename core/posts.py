@@ -9,23 +9,23 @@
 
     **Example:**
         ```python
-    from src.core.post import get_post_thread
+    from core.post import get_post_thread
     threads_data = get_post_thread(board_args)
         ```
 """
 import orjson as json
-from src.utils.language import translate
-from src.network.get_all_boards import get_response, get_boards_api
+from network.get_all_boards import get_response, get_boards_api
 from concurrent.futures import ThreadPoolExecutor
 import config
-from src.flags import parse_args
+from input import parse_args
 from tqdm import tqdm
 tqdm._instances.clear()
 args = parse_args()
+EMPTY = ()
 
 def get_post() -> list:
     try:
-        with open("./src/data/boards.json", "r") as f:
+        with open("./data/boards.json", "r") as f:
             data = json.loads(f.read())
         return [board["board"] for board in data["boards"]]
     except (FileNotFoundError, json.JSONDecodeError):
@@ -35,14 +35,14 @@ def get_post() -> list:
             raise RuntimeError("Failed to download boards: get_boards_api() returned empty." if config.debug else "")
 
         try:
-            with open("./src/data/boards.json", "r") as f:
+            with open("./data/boards.json", "r") as f:
                 data = json.loads(f.read())
             return [board["board"] for board in data["boards"]]
 
         except Exception as e:
             raise RuntimeError(f"Boards.json still invalid after recreation: {e}")
 
-def get_post_thread(selected_boards: list[str] | None = None, workers=20,) -> dict:
+def get_post_thread(selected_boards: list[str] | None = None, workers=20) -> dict:
     boards = get_post()
 
     if selected_boards:
@@ -62,7 +62,7 @@ def get_post_thread(selected_boards: list[str] | None = None, workers=20,) -> di
         if not response:
             if config.debug:
                 print(f"[ERROR RESPONSE API] No response from {api_url}")
-            return (b, ())
+            return (b, EMPTY)
 
         try:
             catalog = json.loads(response.content)
@@ -71,24 +71,24 @@ def get_post_thread(selected_boards: list[str] | None = None, workers=20,) -> di
                 print(f"[ERROR JSON API] Invalid JSON {api_url}")
             return (b, ())
 
-        threads = tuple(thread["no"]
-                        for page in catalog
-                        for thread in page.get("threads", []))
+        threads = []
+        for page in catalog:
+            threads.extend(t["no"] for t in page.get("threads", []))
 
         return (b, threads)
 
-    boards_iter = tqdm(boards, mininterval=0.1, desc=translate("Processing boards", args.language), bar_format=config.color_ansi + "{l_bar}{bar}{r_bar}" + "\033[0m", ncols=100) if not config.debug else boards
+    boards_iter = tqdm(boards, mininterval=0.1, desc="Processing boards", bar_format=config.color_ansi + "{l_bar}{bar}{r_bar}" + "\033[0m", ncols=100) if not config.debug else boards
 
     max_workers = min(workers, config.max_threads)
 
-    with ThreadPoolExecutor(max_workers=max_workers * config.thread_multiplier) as exe:
+    with ThreadPoolExecutor(max_workers=max_workers * max(1, config.thread_multiplier)) as exe:
         for b, threads in exe.map(fetch_boards, boards_iter):
             all_threads[b] = threads
 
     return all_threads
 
 def save_threads(threads: dict):
-    with open("./src/data/threads.json", "w") as f:
+    with open("./data/threads.json", "w") as f:
         json.dump(threads, f, indent=4)
                                                     
 def get_thread_info(board: str, thread_no: int) -> dict | None:

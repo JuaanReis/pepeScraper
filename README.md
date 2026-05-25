@@ -54,12 +54,11 @@ If you use Windows, just go to releases and download the latest version and then
 | `--nsfw-title`, `-nt` | Enable vulgar titles. | `-nt` |
 | `--output`, `-o` | Save the results to a text file (links only). | `-o results.txt` |
 | `--download_image`, `-di` | Download all images from the thread. | `-di` |
-| `--log <w>` | Save logs in `pepescraper/src/data/logs`. | `--log scan.log` |
+| `--log <w>` | Save logs in `pepescraper/data/logs`. | `--log scan.log` |
 | `--all-boards`, `-ab` | Show all boards. | `-ab` |
 | `--proxy`, `-p <w>` | Connect through a proxy. | `-p http://127.0.0.1:8080` |
 | `--title`, `-t` | Apply the search term to the title. | `-t` |
 | `--image`, `-i` | Filter the search by keyword in the image. | `-i` |
-| `--language`, `-l` | Translate the output into the chosen language. | `-l pt` |
 
 ## Example
 
@@ -82,7 +81,7 @@ You have the option to save images of the boards, logs, and output results, but 
 ## Careful with NSFW Content
 
 > I'm serious, pornography can destroy your brain, your body, and your family (no matter how many times I write this, you'll ignore it).
-'
+
 ```bash
     python main.py --keyword "pepe" --date 01/01/2025
 ```

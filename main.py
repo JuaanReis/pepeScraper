@@ -1,17 +1,16 @@
-from src.utils.language import translate
-from src.output.banner import banner_info, display_links
-from src.output.boards_helper import print_boards
-from src.core.search_posts import search_threads, build_thread_links
-from src.core.save_log import save_log
-from src.core.output import download_output
-from src.flags import parse_args
-from src.utils.color import colorize
+from input import parse_args
+from output.banner import banner_info, display_links
+from output.boards_helper import print_boards
+from core.search_posts import search_threads, build_thread_links
+from core.save_log import save_log
+from core.output import download_output
+from output.color import colorize
 from config import auto_cls 
 from time import time
+args = parse_args()
 
 def main():
     start_run = time()
-    args = parse_args()
     if args.all_boards:
         print_boards()
     banner_info()
@@ -24,8 +23,8 @@ def main():
     download_output(args, links, results)
     end_run = time()
     print("--" * 20)
-    print(f"{translate("Requests made in", args.language)} {colorize(f"{end - start:.2f}s", "\033[33m")}")
-    print(f"{translate("Task completed in", args.language)} {colorize(f"{end_run - start_run:.2f}s", "\033[33m")}")
+    print(f"Requests made in {colorize(f'{end - start:.2f}s', "\033[33m")}")
+    print(f"Task completed in {colorize(f'{end_run - start_run:.2f}s', "\033[33m")}")
 
 if __name__ == "__main__":
     if auto_cls:

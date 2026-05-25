@@ -1,4 +1,4 @@
-from src.utils.color import colorize
+from output.color import colorize
 
 def board_help(boards: dict):
     BOARD_WIDTH = 5
@@ -29,11 +29,11 @@ def board_help(boards: dict):
         print(f"{board} | {title_base} | {status}")
 
 def print_boards():
-    from src.flags import parse_args
+    from input import parse_args
     from json import load
     from sys import exit
     args = parse_args()
-    with open("./src/data/boards.json", "r") as f:
+    with open("./data/boards.json", "r") as f:
         b_file = load(f)
         if args.all_boards:
             board_help(b_file)

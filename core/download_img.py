@@ -9,12 +9,12 @@
 
     **Example:**
         ```python
-    from src.core.download_img import download_thread_images
+    from core.download_img import download_thread_images
     download_thread_images("o", 28745723, "downloads")
         ```
 """
 import os
-from src.network.get_all_boards import get_response
+from network.get_all_boards import get_response
 
 def download_thread_images(board: str, thread_no: int, output_dir="images"):
     api_url = f"https://a.4cdn.org/{board}/thread/{thread_no}.json"

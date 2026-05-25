@@ -9,7 +9,7 @@
 
     **Example:**
         ```python
-    from src.core.matcher import thread_matches
+    from core.matcher import thread_matches
     if thread_matches(thread_info, args):
         print("pass")
     else:
@@ -21,7 +21,7 @@ import re
 from datetime import datetime
 import json
 
-with open("./src/core/no_nsfw.json", "r") as f:
+with open("./data/no_nsfw.json", "r") as f:
     NSFW_KEYWORDS = tuple(k.lower() for k in json.load(f))
 
 NSFW_REGEX = re.compile(

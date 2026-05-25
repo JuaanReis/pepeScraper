@@ -6,8 +6,8 @@ def save_log(links: dict, args: Namespace):
         pathlog = args.log
     else:
         import os
-        os.makedirs("./src/data/logs", exist_ok=True)
-        pathlog = "./src/data/logs"
+        os.makedirs("./data/logs", exist_ok=True)
+        pathlog = "./data/logs"
     if config.logs or args.log:
         from datetime import datetime
         try:

@@ -43,8 +43,6 @@ FILTERS:
         Filter the search by keyword in the image.
           
 THREAD BEHAVIOR:
-    -th, threads <n>
-        Scrape in a single thread
 
     -T, --threads <n>
         Number of worker threads. Default = 3.
@@ -70,11 +68,9 @@ OUTPUT:
         Download all images from matched threads.
           
     --log
-        Activate the log that is saved in "./src/data/logs"
+        Activate the log that is saved in "./data/logs"
 
 MISC:
-    -l, --language <lang>
-        translate the output      
 
     -h, --help
         Show this help message.

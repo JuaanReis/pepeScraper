@@ -10,7 +10,7 @@
     **Example:**        
     ```python
         from colorama import Fore
-        from src.utils.color import colorize
+        from utils.color import colorize
     
         print(colorize("OK!", Fore.RED))
     ```

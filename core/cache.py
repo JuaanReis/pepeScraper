@@ -1,7 +1,7 @@
 import time
 from threading import Lock
 from collections import defaultdict
-from src.core.posts import get_thread_info
+from core.posts import get_thread_info
 
 THREAD_CACHE = {}
 CACHE_TTL = 600
