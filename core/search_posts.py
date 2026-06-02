@@ -39,6 +39,7 @@ def search_threads(args: Namespace) -> dict:
     total_tasks = len(tasks)
     if total_tasks == 0:
         return results
+    
     threads = min(args.threads, config.max_threads)
     with ThreadPoolExecutor(max_workers=threads * max(1, config.thread_multiplier)) as executor:
         futures = {
@@ -46,20 +47,43 @@ def search_threads(args: Namespace) -> dict:
             for board, thread_no in tasks
         }
 
-        for future in tqdm(as_completed(futures), mininterval=config.update_bar, total=total_tasks, desc="Processing threads"):
+        if args.live:
+            iterator = as_completed(futures)
+        else:
+            iterator = tqdm(
+                as_completed(futures),
+                mininterval=config.update_bar,
+                total=total_tasks,
+                desc="Processing threads"
+            )
+
+        if args.live:
+            print("\n" + "--" * 20)
+
+        for future in iterator:
             board, thread_no = futures[future]
+
             try:
                 thread_info = future.result()
             except Exception:
                 continue
-
+            
             if not thread_info:
                 continue
-
+            
             if thread_matches(thread_info, args):
-                if config.debug:
-                    print(f"[MATCHER] Blocking thread {thread_info}")
                 results.setdefault(board, []).append(thread_no)
+
+                if args.live:
+                    first_post = thread_info["posts"][0]
+
+                    title = first_post.get("sub", "[No title]")
+
+                    print(
+                        f"[{board}] "
+                        f"https://boards.4chan.org/{board}/thread/{thread_no} "
+                        f"→ {title}"
+                    )
 
     return results
 

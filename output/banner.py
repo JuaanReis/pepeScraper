@@ -133,39 +133,40 @@ def process_thread(board, thread, args) -> str:
     )
 
 def display_links(links: dict, args: Namespace):
-    max_threads = min(args.threads, cpu_count() * 5)
+    if not args.live:
+        max_threads = min(args.threads, cpu_count() * 5)
 
-    if not links:
-        print()
-        print("--" * 20)
-        print(colorize("\n  $ ", Fore.RED), "Links not found\n")
-        return
+        if not links:
+            print()
+            print("--" * 20)
+            print(colorize("\n  $ ", Fore.RED), "Links not found\n")
+            return
 
-    for board, thread_links in links.items():
-        print()
+        for board, thread_links in links.items():
+            print()
 
-        if output_print:
-            print(
-                f"{colorize(f'[Board {board}]', Fore.CYAN)} → "
-                f"[{colorize(len(thread_links), Fore.YELLOW)} results]"
-            )
-            print("-" * (9 + len(board)))
+            if output_print:
+                print(
+                    f"{colorize(f'[Board {board}]', Fore.CYAN)} → "
+                    f"[{colorize(len(thread_links), Fore.YELLOW)} results]"
+                )
+                print("-" * (9 + len(board)))
 
-        results = []
+            results = []
 
-        with ThreadPoolExecutor(max_workers=max_threads) as executor:
-            futures = {
-                executor.submit(process_thread, board, thread, args): thread
-                for thread in thread_links
-            }
+            with ThreadPoolExecutor(max_workers=max_threads) as executor:
+                futures = {
+                    executor.submit(process_thread, board, thread, args): thread
+                    for thread in thread_links
+                }
 
-            for fut in as_completed(futures):
-                results.append(fut.result())
+                for fut in as_completed(futures):
+                    results.append(fut.result())
 
-        for line in results:
-            print(line)
+            for line in results:
+                print(line)
 
-    print("--" * 20 if args.download_image else "")
+        print("--" * 20 if args.download_image else "")
 
 if __name__ == "__main__":
     banner_info()

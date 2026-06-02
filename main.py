@@ -30,4 +30,8 @@ if __name__ == "__main__":
     if auto_cls:
         from os import system, name
         system('cls' if name == 'nt' else 'clear')
-    main()
+    try:
+        from sys import exit
+        main()
+    except KeyboardInterrupt:
+        exit(0)

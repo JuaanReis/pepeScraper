@@ -57,6 +57,7 @@ def parse_args() -> Namespace | None:
     parser.add_argument("--proxy", "-p", type=str, default="")
     parser.add_argument("--log", type=str, default="")
     parser.add_argument("--all-boards", "-ab", action="store_true", default=False)
+    parser.add_argument("--live", "-l", action="store_true", default=False)
     args = parser.parse_args()
 
     if not args.key and not args.all_boards:
