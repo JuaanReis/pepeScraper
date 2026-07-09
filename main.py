@@ -1,4 +1,3 @@
-from input import parse_args
 from output.banner import banner_info, display_links
 from output.boards_helper import print_boards
 from core.search_posts import search_threads, build_thread_links
@@ -7,7 +6,7 @@ from core.output import download_output
 from output.color import colorize
 from config import auto_cls 
 from time import time
-args = parse_args()
+from pepescraper.args import args
 
 def main():
     start_run = time()
@@ -23,8 +22,8 @@ def main():
     download_output(args, links, results)
     end_run = time()
     print("--" * 20)
-    print(f"Requests made in {colorize(f'{end - start:.2f}s', "\033[33m")}")
-    print(f"Task completed in {colorize(f'{end_run - start_run:.2f}s', "\033[33m")}")
+    print(f"Requests made in {colorize(f'{end - start:.3f}s', "\033[33m")}")
+    print(f"Task completed in {colorize(f'{end_run - start_run:.3f}s', "\033[33m")}")
 
 if __name__ == "__main__":
     if auto_cls:
@@ -33,5 +32,5 @@ if __name__ == "__main__":
     try:
         from sys import exit
         main()
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, EOFError, ValueError):
         exit(0)

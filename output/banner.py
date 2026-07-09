@@ -19,12 +19,11 @@ from argparse import Namespace
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from colorama import Fore, init
 from os import cpu_count
-from input import parse_args
+from pepescraper.args import args
 from output.color import colorize
 from config import logo, output_print, color_ansi
 
 init(autoreset=True)
-args = parse_args()
 
 nsfw_boards = [
     "h", "e", "u", "d", "s", "hc", "hm", "y", "t",

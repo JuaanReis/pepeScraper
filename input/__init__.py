@@ -5,7 +5,7 @@
     **Date:** 24-09-2025        
     **Last modification:** 25-12-2025         
     **E-mail:** teixeiradosreisjuan@gmail.com       
-    **Version**  1.1.5rc2    
+    **Version:**  1.1.5rc2    
 
     **Example:**
         ```python

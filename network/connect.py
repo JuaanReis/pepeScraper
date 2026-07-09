@@ -2,7 +2,7 @@
     A function that makes a GET request and returns a ``Response`` object.
 
     **Author:** JuaanReis 
-    **Date:** 25-05-2027        
+    **Date:** 25-05-2026        
     **Last modification:** -         
     **E-mail:** teixeiradosreisjuan@gmail.com           
     **Version:** 1.6.2
@@ -22,7 +22,6 @@ from time import sleep
 import config
 
 def get_response(url: str, retries: int = 3, delay: float = config.delay) -> Response | None:
-
     rr = 0  
 
     for attempt in range(retries):
